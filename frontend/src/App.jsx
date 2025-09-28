@@ -1,24 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import Contact from './components/Contact';
 import Analytics from './components/Analytics';
 import Alerts from './components/Alerts';
+import Recommendations from './pages/Recommendations';
 import { testConnection } from './services/api';
 import './styles/App.css';
 
 function App() {
   const [isBackendConnected, setIsBackendConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [notifications, setNotifications] = useState([]);
   const [selectedCounty, setSelectedCounty] = useState(null);
-  const [analyticsData, setAnalyticsData] = useState(null);
-
+  const [analyticsData, setAnalyticsData] = useState({});
+  // Check backend connection on component mount
   useEffect(() => {
     const checkBackend = async () => {
       try {
+<<<<<<< Updated upstream
         console.log('🔄 App: Testing backend connection...');
         const connected = await testConnection();
         console.log('✅ App: Backend connection result:', connected);
@@ -32,13 +33,22 @@ function App() {
         setIsBackendConnected(false);
       } finally {
         console.log('🚀 App: Setting isLoading to false');
+=======
+        const response = await testConnection();
+        setIsBackendConnected(response.connected);
+      } catch (error) {
+        console.error('Error connecting to backend:', error);
+        setIsBackendConnected(false);
+      } finally {
+>>>>>>> Stashed changes
         setIsLoading(false);
       }
     };
-    
+
     checkBackend();
   }, []);
 
+<<<<<<< Updated upstream
   // Enhanced county selection handler
   const handleCountySelect = (countyData) => {
     console.log(`📍 App: County selected - ${countyData.name}`);
@@ -128,37 +138,39 @@ function App() {
         </div>
       </div>
     );
+=======
+  if (isLoading) {
+    return <div className="loading">Loading...</div>;
+>>>>>>> Stashed changes
   }
 
   // FIXED: Only render the main app when loading is complete AND backend is connected
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex flex-col">
-        <Navigation 
-          notifications={notifications} 
-          selectedCounty={selectedCounty}
-          onClearCounty={clearCountySelection}
-        />
-        <main className="flex-1">
+      <div className="app">
+        <Navigation notifications={[]} />
+        <main className="main-content">
           <Routes>
             <Route path="/" element={
               <Dashboard 
-                onCountySelect={handleCountySelect}
+                isBackendConnected={isBackendConnected}
                 selectedCounty={selectedCounty}
-                onClearCounty={clearCountySelection}
+                onClearCounty={() => setSelectedCounty(null)}
+                analyticsData={analyticsData}
+                onCountySelect={setSelectedCounty}
               />
             } />
             <Route path="/analytics" element={
               <Analytics 
-                selectedCounty={selectedCounty}
-                onCountySelect={handleCountySelect}
-                onClearCounty={clearCountySelection}
-                analyticsData={analyticsData}
+                isBackendConnected={isBackendConnected}
+                onClearCounty={() => {}}
+                analyticsData={{}}
               />
             } />
             <Route path="/alerts" element={
-              <Alerts selectedCounty={selectedCounty} />
+              <Alerts notifications={[]} />
             } />
+            <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/contact" element={<Contact />} />
           </Routes>
         </main>

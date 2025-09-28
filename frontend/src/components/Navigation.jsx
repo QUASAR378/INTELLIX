@@ -23,17 +23,14 @@ const Navigation = ({ notifications = [] }) => {
     { name: 'Dashboard', href: '/', icon: FiHome },
     { name: 'Analytics', href: '/analytics', icon: FiBarChart2 },
     { name: 'Alerts', href: '/alerts', icon: FiAlertTriangle },
+    { name: 'Recommendations', href: '/recommendations', icon: FiZap },
     { name: 'Contact', href: '/contact', icon: FiMail },
   ];
 
   const unreadNotifications = notifications.filter(n => !n.read);
 
   // Demo notifications data
-  const demoNotifications = [
-   
-  
-  ];
-
+  const demoNotifications = [];
   const displayNotifications = notifications.length > 0 ? notifications : demoNotifications;
 
   return (
