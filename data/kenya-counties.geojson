@@ -1,0 +1,851 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Nairobi",
+        "COUNTY_ID": "Nairobi",
+        "COUNTY_CODE": 47
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.4, 36.6],
+          [-1.4, 37.0],
+          [-1.1, 37.0],
+          [-1.1, 36.6],
+          [-1.4, 36.6]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Mombasa",
+        "COUNTY_ID": "Mombasa",
+        "COUNTY_CODE": 1
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.2, 39.4],
+          [-3.8, 39.4],
+          [-3.8, 39.8],
+          [-4.2, 39.8],
+          [-4.2, 39.4]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Kwale",
+        "COUNTY_ID": "Kwale",
+        "COUNTY_CODE": 2
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.8, 39.0],
+          [-3.8, 39.0],
+          [-3.8, 39.8],
+          [-4.8, 39.8],
+          [-4.8, 39.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Kilifi",
+        "COUNTY_ID": "Kilifi",
+        "COUNTY_CODE": 3
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.0, 39.0],
+          [-3.0, 39.0],
+          [-3.0, 40.0],
+          [-4.0, 40.0],
+          [-4.0, 39.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Tana River",
+        "COUNTY_ID": "Tana River",
+        "COUNTY_CODE": 4
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-2.0, 39.5],
+          [-1.0, 39.5],
+          [-1.0, 40.5],
+          [-2.0, 40.5],
+          [-2.0, 39.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Lamu",
+        "COUNTY_ID": "Lamu",
+        "COUNTY_CODE": 5
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-2.5, 40.5],
+          [-2.0, 40.5],
+          [-2.0, 41.5],
+          [-2.5, 41.5],
+          [-2.5, 40.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Taita Taveta",
+        "COUNTY_ID": "Taita Taveta",
+        "COUNTY_CODE": 6
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-4.0, 37.5],
+          [-3.0, 37.5],
+          [-3.0, 38.5],
+          [-4.0, 38.5],
+          [-4.0, 37.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Garissa",
+        "COUNTY_ID": "Garissa",
+        "COUNTY_CODE": 7
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.5, 39.0],
+          [-0.5, 39.0],
+          [-0.5, 40.5],
+          [-1.5, 40.5],
+          [-1.5, 39.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Wajir",
+        "COUNTY_ID": "Wajir",
+        "COUNTY_CODE": 8
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [0.5, 39.0],
+          [2.0, 39.0],
+          [2.0, 41.0],
+          [0.5, 41.0],
+          [0.5, 39.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Mandera",
+        "COUNTY_ID": "Mandera",
+        "COUNTY_CODE": 9
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [2.5, 39.5],
+          [4.0, 39.5],
+          [4.0, 41.5],
+          [2.5, 41.5],
+          [2.5, 39.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Marsabit",
+        "COUNTY_ID": "Marsabit",
+        "COUNTY_CODE": 10
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [1.5, 36.5],
+          [4.0, 36.5],
+          [4.0, 39.5],
+          [1.5, 39.5],
+          [1.5, 36.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Isiolo",
+        "COUNTY_ID": "Isiolo",
+        "COUNTY_CODE": 11
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-0.5, 37.0],
+          [0.5, 37.0],
+          [0.5, 38.5],
+          [-0.5, 38.5],
+          [-0.5, 37.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Meru",
+        "COUNTY_ID": "Meru",
+        "COUNTY_CODE": 12
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-0.5, 37.5],
+          [0.5, 37.5],
+          [0.5, 38.5],
+          [-0.5, 38.5],
+          [-0.5, 37.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Tharaka Nithi",
+        "COUNTY_ID": "Tharaka Nithi",
+        "COUNTY_CODE": 13
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-0.5, 37.5],
+          [0.0, 37.5],
+          [0.0, 38.0],
+          [-0.5, 38.0],
+          [-0.5, 37.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Embu",
+        "COUNTY_ID": "Embu",
+        "COUNTY_CODE": 14
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-0.8, 37.3],
+          [-0.3, 37.3],
+          [-0.3, 37.8],
+          [-0.8, 37.8],
+          [-0.8, 37.3]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Kitui",
+        "COUNTY_ID": "Kitui",
+        "COUNTY_CODE": 15
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-2.5, 37.5],
+          [-1.5, 37.5],
+          [-1.5, 39.0],
+          [-2.5, 39.0],
+          [-2.5, 37.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Machakos",
+        "COUNTY_ID": "Machakos",
+        "COUNTY_CODE": 16
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-2.0, 37.0],
+          [-1.0, 37.0],
+          [-1.0, 38.0],
+          [-2.0, 38.0],
+          [-2.0, 37.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Makueni",
+        "COUNTY_ID": "Makueni",
+        "COUNTY_CODE": 17
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-3.0, 37.0],
+          [-2.0, 37.0],
+          [-2.0, 38.5],
+          [-3.0, 38.5],
+          [-3.0, 37.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Nyandarua",
+        "COUNTY_ID": "Nyandarua",
+        "COUNTY_CODE": 18
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.0, 36.0],
+          [-0.5, 36.0],
+          [-0.5, 36.8],
+          [-1.0, 36.8],
+          [-1.0, 36.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Nyeri",
+        "COUNTY_ID": "Nyeri",
+        "COUNTY_CODE": 19
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.0, 36.5],
+          [-0.3, 36.5],
+          [-0.3, 37.5],
+          [-1.0, 37.5],
+          [-1.0, 36.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Kirinyaga",
+        "COUNTY_ID": "Kirinyaga",
+        "COUNTY_CODE": 20
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-0.8, 37.2],
+          [-0.3, 37.2],
+          [-0.3, 37.8],
+          [-0.8, 37.8],
+          [-0.8, 37.2]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Murang'a",
+        "COUNTY_ID": "Murang'a",
+        "COUNTY_CODE": 21
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.2, 36.8],
+          [-0.5, 36.8],
+          [-0.5, 37.5],
+          [-1.2, 37.5],
+          [-1.2, 36.8]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Kiambu",
+        "COUNTY_ID": "Kiambu",
+        "COUNTY_CODE": 22
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.4, 36.5],
+          [-0.8, 36.5],
+          [-0.8, 37.2],
+          [-1.4, 37.2],
+          [-1.4, 36.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Turkana",
+        "COUNTY_ID": "Turkana",
+        "COUNTY_CODE": 23
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [2.0, 34.0],
+          [4.5, 34.0],
+          [4.5, 37.0],
+          [2.0, 37.0],
+          [2.0, 34.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "West Pokot",
+        "COUNTY_ID": "West Pokot",
+        "COUNTY_CODE": 24
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [1.0, 34.5],
+          [2.5, 34.5],
+          [2.5, 35.5],
+          [1.0, 35.5],
+          [1.0, 34.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Samburu",
+        "COUNTY_ID": "Samburu",
+        "COUNTY_CODE": 25
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [0.5, 36.5],
+          [2.0, 36.5],
+          [2.0, 37.5],
+          [0.5, 37.5],
+          [0.5, 36.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Trans Nzoia",
+        "COUNTY_ID": "Trans Nzoia",
+        "COUNTY_CODE": 26
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [0.5, 34.5],
+          [1.5, 34.5],
+          [1.5, 35.5],
+          [0.5, 35.5],
+          [0.5, 34.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Uasin Gishu",
+        "COUNTY_ID": "Uasin Gishu",
+        "COUNTY_CODE": 27
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [0.0, 35.0],
+          [0.8, 35.0],
+          [0.8, 36.0],
+          [0.0, 36.0],
+          [0.0, 35.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Elgeyo Marakwet",
+        "COUNTY_ID": "Elgeyo Marakwet",
+        "COUNTY_CODE": 28
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [0.0, 35.2],
+          [0.8, 35.2],
+          [0.8, 36.0],
+          [0.0, 36.0],
+          [0.0, 35.2]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Nandi",
+        "COUNTY_ID": "Nandi",
+        "COUNTY_CODE": 29
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-0.5, 35.0],
+          [0.5, 35.0],
+          [0.5, 35.8],
+          [-0.5, 35.8],
+          [-0.5, 35.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Baringo",
+        "COUNTY_ID": "Baringo",
+        "COUNTY_CODE": 30
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [0.0, 35.5],
+          [1.0, 35.5],
+          [1.0, 36.5],
+          [0.0, 36.5],
+          [0.0, 35.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Laikipia",
+        "COUNTY_ID": "Laikipia",
+        "COUNTY_CODE": 31
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-0.5, 36.0],
+          [0.5, 36.0],
+          [0.5, 37.5],
+          [-0.5, 37.5],
+          [-0.5, 36.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Nakuru",
+        "COUNTY_ID": "Nakuru",
+        "COUNTY_CODE": 32
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.5, 35.5],
+          [-0.5, 35.5],
+          [-0.5, 36.5],
+          [-1.5, 36.5],
+          [-1.5, 35.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Narok",
+        "COUNTY_ID": "Narok",
+        "COUNTY_CODE": 33
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-2.0, 35.0],
+          [-1.0, 35.0],
+          [-1.0, 36.5],
+          [-2.0, 36.5],
+          [-2.0, 35.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Kajiado",
+        "COUNTY_ID": "Kajiado",
+        "COUNTY_CODE": 34
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-3.0, 36.0],
+          [-1.5, 36.0],
+          [-1.5, 37.5],
+          [-3.0, 37.5],
+          [-3.0, 36.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Kericho",
+        "COUNTY_ID": "Kericho",
+        "COUNTY_CODE": 35
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.0, 35.0],
+          [-0.3, 35.0],
+          [-0.3, 35.8],
+          [-1.0, 35.8],
+          [-1.0, 35.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Bomet",
+        "COUNTY_ID": "Bomet",
+        "COUNTY_CODE": 36
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.2, 35.0],
+          [-0.5, 35.0],
+          [-0.5, 35.8],
+          [-1.2, 35.8],
+          [-1.2, 35.0]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Kakamega",
+        "COUNTY_ID": "Kakamega",
+        "COUNTY_CODE": 37
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.0, 34.5],
+          [-0.3, 34.5],
+          [-0.3, 35.2],
+          [-1.0, 35.2],
+          [-1.0, 34.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Vihiga",
+        "COUNTY_ID": "Vihiga",
+        "COUNTY_CODE": 38
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.0, 34.5],
+          [-0.3, 34.5],
+          [-0.3, 35.2],
+          [-1.0, 35.2],
+          [-1.0, 34.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Bungoma",
+        "COUNTY_ID": "Bungoma",
+        "COUNTY_CODE": 39
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.2, 34.2],
+          [-0.5, 34.2],
+          [-0.5, 35.0],
+          [-1.2, 35.0],
+          [-1.2, 34.2]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Busia",
+        "COUNTY_ID": "Busia",
+        "COUNTY_CODE": 40
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-0.8, 33.8],
+          [-0.2, 33.8],
+          [-0.2, 34.5],
+          [-0.8, 34.5],
+          [-0.8, 33.8]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Siaya",
+        "COUNTY_ID": "Siaya",
+        "COUNTY_CODE": 41
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-0.5, 33.8],
+          [0.2, 33.8],
+          [0.2, 34.8],
+          [-0.5, 34.8],
+          [-0.5, 33.8]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Kisumu",
+        "COUNTY_ID": "Kisumu",
+        "COUNTY_CODE": 42
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-0.3, 34.5],
+          [0.1, 34.5],
+          [0.1, 35.0],
+          [-0.3, 35.0],
+          [-0.3, 34.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Homa Bay",
+        "COUNTY_ID": "Homa Bay",
+        "COUNTY_CODE": 43
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.2, 33.8],
+          [-0.5, 33.8],
+          [-0.5, 34.8],
+          [-1.2, 34.8],
+          [-1.2, 33.8]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Migori",
+        "COUNTY_ID": "Migori",
+        "COUNTY_CODE": 44
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.5, 33.8],
+          [-0.8, 33.8],
+          [-0.8, 34.5],
+          [-1.5, 34.5],
+          [-1.5, 33.8]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Kisii",
+        "COUNTY_ID": "Kisii",
+        "COUNTY_CODE": 45
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.2, 34.5],
+          [-0.5, 34.5],
+          [-0.5, 35.2],
+          [-1.2, 35.2],
+          [-1.2, 34.5]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "COUNTY_NAM": "Nyamira",
+        "COUNTY_ID": "Nyamira",
+        "COUNTY_CODE": 46
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-1.2, 34.8],
+          [-0.5, 34.8],
+          [-0.5, 35.2],
+          [-1.2, 35.2],
+          [-1.2, 34.8]
+        ]]
+      }
+    }
+  ]
+}

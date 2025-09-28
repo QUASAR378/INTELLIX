@@ -1,0 +1,99 @@
+/* frontend/src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+@layer components {
+  .card-gradient {
+    @apply bg-gradient-to-br from-white to-gray-50 border border-gray-200 shadow-lg;
+  }
+  
+  .energy-card {
+    @apply card-gradient rounded-xl p-8 transition-all duration-300 hover:shadow-xl;
+    min-height: 280px;
+  }
+  
+  .infrastructure-stat-card {
+    @apply bg-white rounded-xl p-6 shadow-md border border-gray-100
+           hover:shadow-lg transition-all duration-300;
+    min-height: 120px;
+  }
+  
+  .metric-card {
+    @apply bg-white rounded-lg p-4 shadow-md border-l-4;
+  }
+  
+  .btn-primary {
+    @apply bg-energy-primary text-white px-6 py-3 rounded-lg font-semibold 
+           shadow-lg hover:bg-green-600 transition-all duration-200 
+           hover:shadow-xl hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-energy-secondary text-white px-4 py-2 rounded-md font-medium
+           shadow-md hover:bg-amber-600 transition-all duration-200;
+  }
+}
+
+/* Loading animations */
+.loading-spinner {
+  @apply animate-spin rounded-full h-8 w-8 border-b-2 border-energy-primary;
+}
+
+/* Map styles */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 12px;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes slide-up {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s ease-out forwards;
+}
