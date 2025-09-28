@@ -1,22 +1,87 @@
 import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import Navigation from './components/Navigation';
+import Footer from './components/Footer';
+import Contact from './components/Contact';
+import Analytics from './components/Analytics';
+import Alerts from './components/Alerts';
 import { testConnection } from './services/api';
+import './styles/App.css';
 
 function App() {
   const [isBackendConnected, setIsBackendConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [notifications, setNotifications] = useState([]);
+  const [selectedCounty, setSelectedCounty] = useState(null);
+  const [analyticsData, setAnalyticsData] = useState(null);
 
   useEffect(() => {
-    // Test backend connection on app load
     const checkBackend = async () => {
       const connected = await testConnection();
       setIsBackendConnected(connected);
       setIsLoading(false);
+      
+      if (connected) {
+        startNotificationSystem();
+      }
     };
     
     checkBackend();
   }, []);
+
+  // Enhanced county selection handler
+  const handleCountySelect = (countyData) => {
+    console.log(`📍 App: County selected - ${countyData.name}`);
+    setSelectedCounty(countyData);
+    
+    // Store in sessionStorage for persistence
+    sessionStorage.setItem('selectedCounty', JSON.stringify(countyData));
+    
+    // Notify other components via custom event
+    window.dispatchEvent(new CustomEvent('countySelected', { 
+      detail: countyData 
+    }));
+  };
+
+  // Clear county selection
+  const clearCountySelection = () => {
+    setSelectedCounty(null);
+    sessionStorage.removeItem('selectedCounty');
+    window.dispatchEvent(new CustomEvent('countyCleared'));
+  };
+
+  // Load previously selected county on app start
+  useEffect(() => {
+    const savedCounty = sessionStorage.getItem('selectedCounty');
+    if (savedCounty) {
+      try {
+        const countyData = JSON.parse(savedCounty);
+        setSelectedCounty(countyData);
+        console.log(`🔄 App: Restored county selection - ${countyData.name}`);
+      } catch (error) {
+        console.error('Failed to parse saved county:', error);
+      }
+    }
+  }, []);
+
+  const startNotificationSystem = () => {
+    // Simulate real-time notifications
+    setInterval(() => {
+      const alerts = [
+        {
+          id: Date.now(),
+          type: 'warning',
+          title: 'High Demand Alert',
+          message: 'Energy demand exceeding generation in selected regions',
+          timestamp: new Date().toISOString(),
+          priority: 'medium'
+        }
+      ];
+      
+      setNotifications(prev => [...alerts.slice(0, 1), ...prev.slice(0, 4)]);
+    }, 60000); // Every minute
+  };
 
   if (isLoading) {
     return (
@@ -24,6 +89,7 @@ function App() {
         <div className="text-center">
           <div className="loading-spinner mx-auto mb-4"></div>
           <h2 className="text-xl font-semibold text-gray-700">Loading PowerGrid AI...</h2>
+          <p className="text-gray-500 mt-2">Initializing smart grid systems</p>
         </div>
       </div>
     );
@@ -36,16 +102,17 @@ function App() {
           <div className="text-6xl mb-4">⚡</div>
           <h2 className="text-2xl font-bold text-red-600 mb-2">Backend Connection Failed</h2>
           <p className="text-gray-600 mb-6">
-            Please make sure your FastAPI backend is running on port 8002.
+            Please make sure your FastAPI backend is running on port 8003.
           </p>
           <button 
             onClick={() => window.location.reload()}
-            className="btn-primary"
+            className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
             Retry Connection
           </button>
           <div className="mt-4 text-sm text-gray-500">
-            <p>Expected backend URL: http://localhost:8002</p>
+            <p>Expected backend URL: http://localhost:8003</p>
+            <p className="mt-2">Run: <code>uvicorn main:app --reload --port 8003</code></p>
           </div>
         </div>
       </div>
@@ -53,30 +120,39 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
-      <Navigation />
-      <main className="container mx-auto px-4 py-6">
-        <Dashboard />
-      </main>
-      
-      {/* Footer */}
-      <footer className="bg-white border-t mt-12">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex justify-between items-center">
-            <div className="text-sm text-gray-600">
-              <strong>PowerGrid AI</strong> - Equitable Energy for Every Kenyan
-            </div>
-            <div className="flex items-center space-x-4 text-sm text-gray-500">
-              <span className="flex items-center">
-                <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                Backend Connected
-              </span>
-              <span>v1.0.0</span>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex flex-col">
+        <Navigation 
+          notifications={notifications} 
+          selectedCounty={selectedCounty}
+          onClearCounty={clearCountySelection}
+        />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={
+              <Dashboard 
+                onCountySelect={handleCountySelect}
+                selectedCounty={selectedCounty}
+                onClearCounty={clearCountySelection}
+              />
+            } />
+            <Route path="/analytics" element={
+              <Analytics 
+                selectedCounty={selectedCounty}
+                onCountySelect={handleCountySelect}
+                onClearCounty={clearCountySelection}
+                analyticsData={analyticsData}
+              />
+            } />
+            <Route path="/alerts" element={
+              <Alerts selectedCounty={selectedCounty} />
+            } />
+            <Route path="/contact" element={<Contact />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 
