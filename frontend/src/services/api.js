@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8003/api';
+const API_BASE_URL = 'http://localhost:8002/api';
 
 // Create axios instance with default config
 const api = axios.create({
@@ -75,7 +75,8 @@ export const testConnection = async () => {
     const healthUrl = API_BASE_URL.replace('/api', '/health') + '?t=' + Date.now();
     console.log('Testing connection to:', healthUrl);
     const response = await axios.get(healthUrl, { 
-      timeout: 5000,
+      timeout: 10000,  // Increased timeout
+      withCredentials: false,  // Ensure CORS works
       headers: {
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache'
@@ -85,7 +86,15 @@ export const testConnection = async () => {
     return response.status === 200;
   } catch (error) {
     console.error('Backend connection failed:', error);
+    console.error('Error details:', error.message);
     console.error('Attempted URL:', API_BASE_URL.replace('/api', '/health'));
+    
+    // Check if it's a CORS issue specifically
+    if (error.code === 'ERR_NETWORK' && error.message === 'Network Error') {
+      console.error('This appears to be a CORS or network connectivity issue.');
+      console.error('Make sure the backend is running on the correct port and CORS is configured.');
+    }
+    
     return false;
   }
 };
