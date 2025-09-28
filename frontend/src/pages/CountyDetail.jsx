@@ -19,6 +19,7 @@ const CountyDetail = () => {
         console.log(`Loading county data for: ${countyId}`);
         
         const response = await countiesAPI.getById(countyId);
+        console.log('County data received:', response.data);
         setCounty(response.data);
         setError(null);
       } catch (err) {

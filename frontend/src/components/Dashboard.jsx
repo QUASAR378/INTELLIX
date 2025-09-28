@@ -27,7 +27,7 @@ const Dashboard = () => {
   const [aiRecommendation, setAiRecommendation] = useState(null);
   const [simulationConfig, setSimulationConfig] = useState(null);
 
-  // 🎯 ENHANCED COUNTY SELECTION WITH AUTOMATIC SIMULATION & AI FLOW
+  // Enhanced county selection with automatic simulation & AI flow
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationProgress, setSimulationProgress] = useState(0);
   const [simulationResults, setSimulationResults] = useState(null);
@@ -47,50 +47,49 @@ const Dashboard = () => {
       
       // Extract county name from the data
       const countyName = countyData.name || countyData.county_name || countyData.id;
-      console.log(`🎯 Starting ENHANCED county flow for: ${countyName}`);
-      console.log(`📊 County Data Received:`, countyData);
+      console.log(`Starting REAL DATA county flow for: ${countyName}`);
+      console.log(`County Data Received:`, countyData);
       
-      // Generate realistic county-specific data using the passed data or defaults
-      const countyProfiles = {
-        'Turkana': { population: 926976, blackout_freq: 45, solar_irradiance: 7.2, grid_distance: 120, hospitals: 8, schools: 156 },
-        'Marsabit': { population: 459785, blackout_freq: 40, solar_irradiance: 7.0, grid_distance: 100, hospitals: 6, schools: 89 },
-        'Samburu': { population: 310327, blackout_freq: 35, solar_irradiance: 6.8, grid_distance: 85, hospitals: 4, schools: 67 },
-        'Wajir': { population: 781263, blackout_freq: 50, solar_irradiance: 7.5, grid_distance: 140, hospitals: 7, schools: 134 },
-        'Mandera': { population: 1025756, blackout_freq: 55, solar_irradiance: 7.8, grid_distance: 160, hospitals: 9, schools: 178 },
-        'Garissa': { population: 841353, blackout_freq: 42, solar_irradiance: 7.3, grid_distance: 95, hospitals: 8, schools: 145 },
-        'Isiolo': { population: 268002, blackout_freq: 30, solar_irradiance: 6.9, grid_distance: 70, hospitals: 3, schools: 54 },
-        'Tana River': { population: 315943, blackout_freq: 38, solar_irradiance: 7.1, grid_distance: 90, hospitals: 4, schools: 68 },
-        'Nairobi': { population: 4397073, blackout_freq: 25, solar_irradiance: 5.8, grid_distance: 5, hospitals: 95, schools: 820 },
-        'Kisumu': { population: 1155574, blackout_freq: 30, solar_irradiance: 5.2, grid_distance: 8, hospitals: 30, schools: 400 }
-      };
-
-      // Use passed county data or fallback to profile
-      const profile = countyProfiles[countyName] || {
-        population: countyData.population || Math.floor(Math.random() * 500000) + 200000,
-        blackout_freq: countyData.blackout_frequency || Math.floor(Math.random() * 30) + 20,
-        solar_irradiance: countyData.solar_irradiance || (Math.random() * 2) + 5.5,
-        grid_distance: countyData.grid_distance || Math.floor(Math.random() * 80) + 40,
-        hospitals: countyData.hospitals || Math.floor(Math.random() * 8) + 2,
-        schools: countyData.schools || Math.floor(Math.random() * 100) + 30
-      };
-
-      // Calculate economic activity based on population and infrastructure
-      const economic_activity_index = Math.min(1.0, 
-        (profile.population / 1000000) * 0.4 + 
-        (profile.hospitals / 20) * 0.3 + 
-        (profile.schools / 200) * 0.3
-      );
-
-      console.log(`📊 County Profile for ${countyName}:`, profile);
-
-      // Merge passed data with profile
-      const completeCountyData = {
-        ...profile,
-        ...countyData,
-        county_name: countyName,
-        county_id: countyName,
-        name: countyName
-      };
+      // Fetch complete county data from backend API instead of using static profiles
+      let completeCountyData;
+      const countyId = countyData.id || countyData.county_id || countyName;
+      
+      try {
+        console.log(`🔍 Fetching complete county data from API for: ${countyId}`);
+        const response = await countiesAPI.getById(countyId);
+        const apiData = response.data;
+        
+        console.log(`Successfully fetched REAL county data from API:`, apiData);
+        
+        // Use real API data - no more static profiles or random fallbacks!
+        completeCountyData = {
+          ...apiData,
+          name: apiData.county_name || countyName,
+          id: apiData.county_id || countyId,
+          county_name: apiData.county_name || countyName,
+          county_id: apiData.county_id || countyId
+        };
+        
+        console.log(`REAL County Data for ${countyName}:`, {
+          population: completeCountyData.population,
+          hospitals: completeCountyData.hospitals,
+          schools: completeCountyData.schools,
+          solar_irradiance: completeCountyData.solar_irradiance,
+          grid_distance: completeCountyData.grid_distance,
+          blackout_freq: completeCountyData.blackout_freq
+        });
+        
+      } catch (error) {
+        console.error(`❌ Failed to fetch county data from API for ${countyId}:`, error);
+        // Only use passed data if API completely fails
+        completeCountyData = {
+          ...countyData,
+          county_name: countyName,
+          county_id: countyId,
+          name: countyName,
+          id: countyId
+        };
+      }
       
       setSelectedCounty(completeCountyData);
       
@@ -101,10 +100,17 @@ const Dashboard = () => {
       // Force a small delay to ensure state updates are processed
       await new Promise(resolve => setTimeout(resolve, 100));
       
-      console.log(`🚀 STEP 1: Starting 1-minute simulation for ${countyName}...`);
+      console.log(`STEP 1: Starting 1-minute simulation for ${countyName}...`);
       
-      // STEP 1: START THE SIMULATION IMMEDIATELY
-      await startSimulationProcess(completeCountyData, profile, economic_activity_index);
+      // Calculate economic activity using real data
+      const economic_activity_index = completeCountyData.economic_activity_index || Math.min(1.0, 
+        (completeCountyData.population / 1000000) * 0.4 + 
+        (completeCountyData.hospitals / 20) * 0.3 + 
+        (completeCountyData.schools / 200) * 0.3
+      );
+      
+      // STEP 1: START THE SIMULATION IMMEDIATELY with real data
+      await startSimulationProcess(completeCountyData, completeCountyData, economic_activity_index);
 
       
     } catch (error) {
@@ -113,7 +119,7 @@ const Dashboard = () => {
     }
   };
 
-  // 🚀 NEW: SIMULATION PROCESS WITH 1-MINUTE TIMER + AI ANALYSIS
+  // Simulation process with 1-minute timer + AI analysis
   const startSimulationProcess = async (completeCountyData, profile, economic_activity_index) => {
     try {
       const countyName = completeCountyData.name;
@@ -135,7 +141,7 @@ const Dashboard = () => {
       
       setSimulationConfig(intelligentConfig);
       
-      console.log(`🚀 Running simulation with config:`, intelligentConfig);
+      console.log(`Running simulation with config:`, intelligentConfig);
       
       // Start the simulation in the backend
       const simulationResponse = await minigridsAPI.simulate(intelligentConfig);
@@ -146,8 +152,8 @@ const Dashboard = () => {
       
       // STEP 3: GET FINAL SIMULATION RESULTS AND STOP LOADING
       setSimulationResults(simulationResponse.data);
-      setIsSimulating(false); // 🎯 IMPORTANT: Stop isSimulating here to show MiniGrid
-      console.log(`📊 STEP 2: Simulation completed for ${countyName} - MiniGrid should appear now`);
+      setIsSimulating(false); // Stop isSimulating here to show MiniGrid
+      console.log(`STEP 2: Simulation completed for ${countyName} - MiniGrid should appear now`);
       
       // STEP 4: MINI-GRID SIMULATION IS NOW RUNNING (Auto-start will handle the 45-second animation)
       console.log(`🔴 STEP 3: MiniGrid with auto-start should be visible and running for ${countyName}...`);
@@ -170,7 +176,7 @@ const Dashboard = () => {
       const countyName = selectedCounty?.name || selectedCounty?.county_name;
       const profile = selectedCounty;
       
-      console.log(`🤖 STEP 4: Getting AI analysis for ${countyName} after MiniGrid simulation...`);
+      console.log(`STEP 4: Getting AI analysis for ${countyName} after MiniGrid simulation...`);
       const aiResponse = await dashboardAPI.getAIAnalysis({
         county_name: countyName,
         population: profile.population,
@@ -260,7 +266,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 🎯 HEADER */}
+      {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
@@ -319,7 +325,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* 🎯 MAIN CONTENT */}
+      {/* Main Content */}
       <div className="max-w-full mx-auto px-8 py-12">
         {activeView === 'map' && (
           <div className="space-y-8">
@@ -356,8 +362,8 @@ const Dashboard = () => {
             {/* Live Analysis & Simulation - Balanced space */}
             <div className="lg:col-span-3 space-y-6">
               
-              {/* 🚀 SIMULATION PROGRESS (Shows during simulation) */}
-              {console.log(`🖥️ RENDER DEBUG: isSimulating=${isSimulating}, selectedCounty=${!!selectedCounty}, activeView=${activeView}`)}
+              {/* Simulation Progress */}
+
               {isSimulating && (
                 <div className="simulation-progress bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-8 text-white">
                   <div className="text-center">
@@ -422,7 +428,7 @@ const Dashboard = () => {
                 </div>
               )}
 
-              {/* 📊 SIMULATION RESULTS (Shows after initial simulation) */}
+              {/* Simulation Results */}
               {!isSimulating && simulationResults && !aiRecommendation && (
                 <div className="simulation-results bg-white rounded-lg shadow-sm border p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
@@ -471,7 +477,7 @@ const Dashboard = () => {
                 </div>
               )}
 
-              {/* 🎯 LIVE MINI-GRID SIMULATION (Auto-starts after progress) */}
+              {/* Live Mini-Grid Simulation */}
               {!isSimulating && simulationConfig && !aiRecommendation && (
                 <div className="bg-white rounded-lg shadow-sm border p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
@@ -490,7 +496,7 @@ const Dashboard = () => {
                 </div>
               )}
 
-              {/* 🤖 AI ANALYSIS (Shows after live simulation completes) */}
+              {/* AI Analysis */}
               {!isSimulating && aiRecommendation && (
                 <div className="bg-white rounded-lg shadow-sm border p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">

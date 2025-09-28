@@ -2,6 +2,18 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { MapContainer, TileLayer, GeoJSON, Marker, Popup, useMap } from 'react-leaflet';
 import { countiesAPI } from '../services/api';
+import { 
+  FiCpu, 
+  FiMap, 
+  FiAlertTriangle, 
+  FiSun, 
+  FiZap, 
+  FiSettings,
+  FiHome,
+  FiTarget,
+  FiDollarSign,
+  FiMapPin
+} from 'react-icons/fi';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -360,7 +372,7 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
           position: relative;
         " onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'">
           ${getSolutionIcon(county.solutionType)}
-          ${isAIUpdated ? '<div style="position: absolute; top: -8px; right: -8px; background: #8B5CF6; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 10px;">🤖</div>' : ''}
+          ${isAIUpdated ? '<div style="position: absolute; top: -8px; right: -8px; background: #8B5CF6; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: bold;">AI</div>' : ''}
         </div>
       `,
       iconSize: [30, 30],
@@ -370,12 +382,12 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
 
   const getSolutionIcon = (solutionType) => {
     const icons = {
-      solar_minigrid: '☀️',
-      grid_extension: '🔌',
-      hybrid_solution: '⚡',
-      grid_optimization: '🔧',
+      solar_minigrid: '<div style="color: #F59E0B; font-size: 16px;">◉</div>',
+      grid_extension: '<div style="color: #10B981; font-size: 16px;">◉</div>',
+      hybrid_solution: '<div style="color: #8B5CF6; font-size: 16px;">◉</div>',
+      grid_optimization: '<div style="color: #3B82F6; font-size: 16px;">◉</div>',
     };
-    return icons[solutionType] || '❓';
+    return icons[solutionType] || '<div style="color: #6B7280; font-size: 16px;">◉</div>';
   };
 
   const handleMarkerClick = async (county) => {
@@ -383,7 +395,7 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
     
     // Trigger enhanced simulation + AI flow when county is selected
     if (onCountySelect) {
-      console.log(`🗺️ Map: County ${county.name} clicked, starting enhanced flow...`);
+      console.log(`Map: County ${county.name} clicked, starting enhanced flow...`);
       
       // Pass comprehensive county data to parent component
       onCountySelect({
@@ -432,9 +444,15 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
       <div className="absolute top-4 left-4 bg-white rounded-lg shadow-lg p-3 z-1000 min-w-48">
         <h5 className="font-semibold text-gray-800 mb-3 text-sm flex items-center gap-2">
           {isAnalyzing ? (
-            <>🤖 <span className="animate-pulse">AI Analyzing...</span></>
+            <>
+              <FiCpu className="w-4 h-4 animate-pulse" />
+              <span className="animate-pulse">AI Analyzing...</span>
+            </>
           ) : (
-            <>🤖 AI Insights Filter</>
+            <>
+              <FiCpu className="w-4 h-4" />
+              AI Insights Filter
+            </>
           )}
         </h5>
         <div className="space-y-2">
@@ -446,7 +464,8 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
             }`}
             onClick={() => setFilterType('all')}
           >
-            🗺️ All Counties ({mapData.length})
+            <FiMap className="w-4 h-4 mr-1" />
+            All Counties ({mapData.length})
           </button>
           
           <button
@@ -457,7 +476,8 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
             }`}
             onClick={() => setFilterType('high_priority')}
           >
-            🚨 Highest Priority ({mapData.filter(c => c.priorityScore >= 85).length})
+            <FiAlertTriangle className="w-4 h-4 mr-1" />
+            Highest Priority ({mapData.filter(c => c.priorityScore >= 85).length})
           </button>
 
           <button
@@ -468,7 +488,8 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
             }`}
             onClick={() => setFilterType('solar_suitable')}
           >
-            ☀️ Solar Suitable ({mapData.filter(c => c.solar_irradiance >= 6.0 && c.solutionType === 'solar_minigrid').length})
+            <FiSun className="w-4 h-4 mr-1" />
+            Solar Suitable ({mapData.filter(c => c.solar_irradiance >= 6.0 && c.solutionType === 'solar_minigrid').length})
           </button>
 
           <button
@@ -479,7 +500,8 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
             }`}
             onClick={() => setFilterType('quick_wins')}
           >
-            ⚡ Quick Wins ({mapData.filter(c => c.roi_percentage >= 15 && c.grid_distance < 100).length})
+            <FiZap className="w-4 h-4 mr-1" />
+            Quick Wins ({mapData.filter(c => c.roi_percentage >= 15 && c.grid_distance < 100).length})
           </button>
         </div>
 
@@ -516,7 +538,8 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
                   {getSolutionIcon(county.solutionType)} {county.name} County
                   {county.ai_updated && (
                     <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full flex items-center gap-1">
-                      🤖 AI Updated
+                      <FiCpu className="w-3 h-3" />
+                      AI Updated
                     </span>
                   )}
                 </h3>
@@ -559,11 +582,11 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
                 <div className="mb-3 p-2 bg-blue-50 rounded text-xs">
                   <div className="font-medium text-blue-800 mb-1">Infrastructure</div>
                   <div className="flex justify-between">
-                    <span>🏥 Hospitals: {county.hospitals}</span>
-                    <span>🏫 Schools: {county.schools}</span>
+                    <span>Hospitals: {county.hospitals}</span>
+                    <span>Schools: {county.schools}</span>
                   </div>
                   <div className="mt-1">
-                    <span>📍 Grid Distance: {county.grid_distance}km</span>
+                    <span>Grid Distance: {county.grid_distance}km</span>
                   </div>
                 </div>
                 
@@ -615,9 +638,15 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
                   }`}
                 >
                   {isAnalyzing && selectedCounty?.id === county.id ? (
-                    <>🤖 AI Analyzing...</>
+                    <>
+                      <FiCpu className="w-4 h-4 mr-1" />
+                      AI Analyzing...
+                    </>
                   ) : (
-                    <>🔍 Get AI Recommendation</>
+                    <>
+                      <FiTarget className="w-4 h-4 mr-1" />
+                      Get AI Recommendation
+                    </>
                   )}
                 </button>
               </div>
@@ -628,7 +657,10 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
       
       {/* Enhanced Map Controls */}
       <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-3 z-1000">
-        <h5 className="font-semibold text-gray-800 mb-3 text-sm">🎛️ Map Controls</h5>
+        <h5 className="font-semibold text-gray-800 mb-3 text-sm flex items-center">
+          <FiSettings className="w-4 h-4 mr-2" />
+          Map Controls
+        </h5>
         <div className="flex flex-col space-y-2">
           <button
             className="px-3 py-2 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center gap-2"
@@ -638,7 +670,8 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
               }
             }}
           >
-            🏠 Reset View
+            <FiHome className="w-4 h-4 mr-1" />
+            Reset View
           </button>
           
           <button
@@ -653,7 +686,8 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
               }
             }}
           >
-            🚨 Highest Priority
+            <FiTarget className="w-4 h-4 mr-1" />
+            Highest Priority
           </button>
 
           <button
@@ -668,7 +702,8 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
               }
             }}
           >
-            ☀️ Solar Regions
+            <FiSun className="w-4 h-4 mr-1" />
+            Solar Regions
           </button>
 
           <button
@@ -677,15 +712,22 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
               // Calculate and show investment summary
               const totalInvestment = mapData.reduce((sum, c) => sum + c.investment, 0);
               const avgROI = mapData.reduce((sum, c) => sum + (c.roi_percentage || 0), 0) / mapData.length;
-              alert(`💰 Investment Summary:\n\nTotal: ${formatCurrency(totalInvestment)}\nAverage ROI: ${avgROI.toFixed(1)}%\nCounties: ${mapData.length}`);
+              alert(`Investment Summary:\n\nTotal: ${formatCurrency(totalInvestment)}\nAverage ROI: ${avgROI.toFixed(1)}%\nCounties: ${mapData.length}`);
             }}
           >
-            💰 Investment Summary
+            <FiDollarSign className="w-4 h-4 mr-1" />
+            Investment Summary
           </button>
 
           <div className="pt-2 border-t text-xs text-gray-600">
-            <div>📍 Selected: {selectedCounty?.name || 'None'}</div>
-            <div>🏘️ Total Counties: {mapData.length}</div>
+            <div className="flex items-center">
+              <FiMapPin className="w-3 h-3 mr-1" />
+              Selected: {selectedCounty?.name || 'None'}
+            </div>
+            <div className="flex items-center">
+              <FiMap className="w-3 h-3 mr-1" />
+              Total Counties: {mapData.length}
+            </div>
           </div>
         </div>
       </div>

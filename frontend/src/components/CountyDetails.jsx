@@ -27,14 +27,14 @@ const CountyDetails = ({ county }) => {
   const [isAnimated, setIsAnimated] = useState(false);
 
   useEffect(() => {
-
+    console.log('CountyDetails received county data:', county);
     setTimeout(() => setIsAnimated(true), 100);
   }, [county]);
 
   if (!county) {
     return (
       <div className="energy-card text-center py-12">
-        <div className="text-6xl mb-4">🗺️</div>
+        <FiMap className="w-16 h-16 mx-auto mb-4 text-gray-400" />
         <h3 className="text-xl font-semibold text-gray-700 mb-2">No County Selected</h3>
         <p className="text-gray-600">Click on a county marker in the map to view detailed analysis</p>
       </div>
@@ -75,7 +75,7 @@ const CountyDetails = ({ county }) => {
       <div className={`energy-card ${isAnimated ? 'animate-fade-in' : 'opacity-0'}`}>
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
-            <div className="text-6xl">🏛️</div>
+            <FiHome className="w-12 h-12 text-blue-600" />
             <div>
               <h1 className="text-3xl font-bold text-gray-800">{county.name || county.county_name} County</h1>
               <p className="text-lg text-gray-600">{county.region || 'Kenya'} Region</p>
@@ -129,7 +129,10 @@ const CountyDetails = ({ county }) => {
           <div className="space-y-8">
             {/* Key Metrics Card - Full Width */}
             <div className="energy-card">
-              <h3 className="text-xl font-semibold text-gray-800 mb-6">📊 Key Metrics</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                <FiActivity className="w-5 h-5 mr-2" />
+                Key Metrics
+              </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                   <div className="flex items-center space-x-3 mb-3">
@@ -185,35 +188,38 @@ const CountyDetails = ({ county }) => {
 
             {/* Infrastructure Card - Full Width */}
             <div className="energy-card">
-              <h3 className="text-xl font-semibold text-gray-800 mb-6">🏗️ Infrastructure</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <FiGrid className="w-5 h-5 mr-2" />
+                Infrastructure
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="infrastructure-stat-card text-center bg-blue-50 border-blue-200">
-                  <FiHome className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-                  <div className="text-4xl font-bold text-blue-600 mb-2">
+                  <FiHome className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-blue-600 mb-1">
                     {county.hospitals || 0}
                   </div>
-                  <div className="text-lg font-medium text-blue-700">Hospitals</div>
+                  <div className="text-sm font-medium text-blue-700">Hospitals</div>
                 </div>
                 <div className="infrastructure-stat-card text-center bg-purple-50 border-purple-200">
-                  <FiBook className="w-8 h-8 text-purple-600 mx-auto mb-3" />
-                  <div className="text-4xl font-bold text-purple-600 mb-2">
+                  <FiBook className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-purple-600 mb-1">
                     {county.schools || 0}
                   </div>
-                  <div className="text-lg font-medium text-purple-700">Schools</div>
+                  <div className="text-sm font-medium text-purple-700">Schools</div>
                 </div>
                 <div className="infrastructure-stat-card text-center bg-green-50 border-green-200">
-                  <FiHome className="w-8 h-8 text-green-600 mx-auto mb-3" />
-                  <div className="text-4xl font-bold text-green-600 mb-2">
+                  <FiHome className="w-6 h-6 text-green-600 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-green-600 mb-1">
                     {Math.floor((county.population || 0) / 4.5).toLocaleString()}
                   </div>
-                  <div className="text-lg font-medium text-green-700">Est. Households</div>
+                  <div className="text-sm font-medium text-green-700">Est. Households</div>
                 </div>
                 <div className="infrastructure-stat-card text-center bg-orange-50 border-orange-200">
-                  <FiShoppingBag className="w-8 h-8 text-orange-600 mx-auto mb-3" />
-                  <div className="text-4xl font-bold text-orange-600 mb-2">
+                  <FiShoppingBag className="w-6 h-6 text-orange-600 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-orange-600 mb-1">
                     {Math.floor((county.population || 0) / 10000)}
                   </div>
-                  <div className="text-lg font-medium text-orange-700">Est. Markets</div>
+                  <div className="text-sm font-medium text-orange-700">Est. Markets</div>
                 </div>
               </div>
             </div>
@@ -227,7 +233,10 @@ const CountyDetails = ({ county }) => {
           <div className="space-y-8">
             {/* Energy Chart - Full Width */}
             <div className="energy-card">
-              <h3 className="text-xl font-semibold text-gray-800 mb-6">⚡ Energy Supply vs Demand</h3>
+              <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                <FiZap className="w-5 h-5 mr-2" />
+                Energy Supply vs Demand
+              </h3>
               <div className="h-96">
                 <Bar 
                   data={energyChartData}

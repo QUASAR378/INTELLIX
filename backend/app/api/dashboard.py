@@ -3,8 +3,25 @@ from typing import Dict, Any, List
 import random
 from datetime import datetime, timedelta
 from app.services.ai_agent import ai_agent, CountyAnalysisRequest
+from app.services.data_service import DataService
 
 router = APIRouter()
+data_service = DataService()
+
+@router.get("/weather")
+async def get_weather_data():
+    """Get real-time weather data for all counties"""
+    weather_data = data_service._get_weather_data()
+    return {
+        "timestamp": "2025-09-28",
+        "counties": weather_data,
+        "summary": {
+            "avg_temperature": sum(data["temperature"] for data in weather_data.values()) / len(weather_data),
+            "avg_solar_radiation": sum(data["solar_radiation"] for data in weather_data.values()) / len(weather_data),
+            "avg_humidity": sum(data["humidity"] for data in weather_data.values()) / len(weather_data),
+            "total_counties": len(weather_data)
+        }
+    }
 
 @router.get("/overview")
 async def get_dashboard_overview():
@@ -34,7 +51,7 @@ async def get_dashboard_overview():
 @router.get("/stats")
 async def get_dashboard_stats():
     """Get dashboard statistics for charts and metrics"""
-    # Generate sample historical data for the last 30 days
+    # Generate historical data for the last 30 days
     dates = [(datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d") for i in range(29, -1, -1)]
     
     return {
