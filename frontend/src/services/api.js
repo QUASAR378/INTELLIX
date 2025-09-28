@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8003/api';
+const API_BASE_URL = 'http://localhost:8000/api';
 
 // Create axios 
 const api = axios.create({
@@ -315,7 +315,7 @@ export const healthAPI = {
 };
 
 // Enhanced connection testing with retry logic
-export const testConnection = async (maxRetries = 3) => {
+export const testConnection = async (maxRetries = 40) => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`🔌 Testing backend connection (attempt ${attempt}/${maxRetries})...`);

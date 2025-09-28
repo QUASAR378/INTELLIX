@@ -1,7 +1,7 @@
 # backend/app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import counties, minigrids, dashboard
+from app.api import counties, minigrids, dashboard, analytics
 from config.settings import settings
 
 app = FastAPI(
@@ -23,6 +23,7 @@ app.add_middleware(
 app.include_router(counties.router, prefix="/api/counties", tags=["counties"])
 app.include_router(minigrids.router, prefix="/api/minigrids", tags=["minigrids"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
+app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
 
 @app.get("/")
 async def root():
@@ -34,6 +35,7 @@ async def root():
             "counties": "/api/counties/",
             "dashboard": "/api/dashboard/",
             "minigrids": "/api/minigrids/",
+            "analytics": "/api/analytics/",
             "docs": "/docs"
         }
     }

@@ -18,12 +18,21 @@ function App() {
 
   useEffect(() => {
     const checkBackend = async () => {
-      const connected = await testConnection();
-      setIsBackendConnected(connected);
-      setIsLoading(false);
-      
-      if (connected) {
-        startNotificationSystem();
+      try {
+        console.log('🔄 App: Testing backend connection...');
+        const connected = await testConnection();
+        console.log('✅ App: Backend connection result:', connected);
+        setIsBackendConnected(connected);
+        
+        if (connected) {
+          startNotificationSystem();
+        }
+      } catch (error) {
+        console.error('❌ App: Backend check failed:', error);
+        setIsBackendConnected(false);
+      } finally {
+        console.log('🚀 App: Setting isLoading to false');
+        setIsLoading(false);
       }
     };
     
@@ -83,26 +92,28 @@ function App() {
     }, 60000); // Every minute
   };
 
+  // FIXED: Show loading screen only when isLoading is TRUE
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
         <div className="text-center">
           <div className="loading-spinner mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-700">Loading PowerGrid AI...</h2>
+          <h2 className="text-xl font-semibold text-gray-700">Loading UmemeAI...</h2>
           <p className="text-gray-500 mt-2">Initializing smart grid systems</p>
         </div>
       </div>
     );
   }
 
-  if (!isBackendConnected) {
+  // FIXED: Show connection error only when backend is not connected AND loading is done
+  if (!isBackendConnected && !isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
         <div className="text-center max-w-md">
           <div className="text-6xl mb-4">⚡</div>
           <h2 className="text-2xl font-bold text-red-600 mb-2">Backend Connection Failed</h2>
           <p className="text-gray-600 mb-6">
-            Please make sure your FastAPI backend is running on port 8003.
+            Please make sure your FastAPI backend is running on port 8000.
           </p>
           <button 
             onClick={() => window.location.reload()}
@@ -111,14 +122,15 @@ function App() {
             Retry Connection
           </button>
           <div className="mt-4 text-sm text-gray-500">
-            <p>Expected backend URL: http://localhost:8003</p>
-            <p className="mt-2">Run: <code>uvicorn main:app --reload --port 8003</code></p>
+            <p>Expected backend URL: http://localhost:8000</p>
+            <p className="mt-2">Run: <code>uvicorn main:app --reload --port 8000</code></p>
           </div>
         </div>
       </div>
     );
   }
 
+  // FIXED: Only render the main app when loading is complete AND backend is connected
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex flex-col">
