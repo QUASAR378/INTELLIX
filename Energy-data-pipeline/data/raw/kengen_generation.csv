@@ -1,0 +1,4 @@
+plant_name,capacity_mw,plant_type,county,timestamp
+Olkaria I,185,geothermal,Nakuru,2025-09-28 19:37:20.953071
+Turkana Wind,310,wind,Turkana,2025-09-28 19:37:20.953071
+Seven Forks Hydro,720,hydro,Embu,2025-09-28 19:37:20.953071

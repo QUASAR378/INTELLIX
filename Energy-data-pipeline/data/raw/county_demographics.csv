@@ -1,0 +1,6 @@
+county_name,population,hospitals,schools,poverty_index,avg_solar_irradiance,avg_reliability_score,energy_access_score,renewable_potential_score,timestamp
+Nairobi,1020114,14,114,84,4.5,34,84,34,2025-09-28 19:37:24.588285
+Turkana,3391499,99,499,79,4.6,59,79,30,2025-09-28 19:37:24.588588
+Kisumu,1302337,37,337,37,4.6,20,37,30,2025-09-28 19:37:24.588588
+Mombasa,447237,37,237,87,4.5,37,87,47,2025-09-28 19:37:24.589100
+Nakuru,3355218,18,218,38,4.7,20,38,30,2025-09-28 19:37:24.589479
