@@ -1,4 +1,4 @@
-# Kenya Energy Hackathon - PowerGrid AI 🚀
+# INTELLIX - Kenya Energy Dashboard (umeme AI) 🚀
 
 **"Equitable Energy for Every Kenyan"**
 
@@ -157,3 +157,6 @@ uvicorn app.main:app --reload
 
 - [Setup Instructions](docs/SETUP.md)
 - [API Documentation](docs/API.md)
+
+---
+*Part of INTELLIX - Intelligent Solutions for Real-World Impact*
