@@ -590,22 +590,8 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
                   </div>
                 </div>
                 
-                {/* Investment & ROI */}
+                {/* County Statistics */}
                 <div className="space-y-2 text-sm mb-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Recommended Solution:</span>
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                      {(county.solutionType || 'grid_extension').replace('_', ' ').toUpperCase()}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Investment Needed:</span>
-                    <span className="font-semibold text-green-600">
-                      {formatCurrency(county.investment)}
-                    </span>
-                  </div>
-
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Expected ROI:</span>
                     <span className="font-semibold text-purple-600">

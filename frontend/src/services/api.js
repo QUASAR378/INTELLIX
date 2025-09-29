@@ -78,7 +78,7 @@ api.interceptors.response.use(
     }
     
     if (error.code === 'ECONNREFUSED' || error.message === 'Request aborted' || !error.response) {
-      const backendError = new Error('Backend Connection Failed. Please ensure the FastAPI backend is running on port 8002.');
+      const backendError = new Error('Backend Connection Failed. Please ensure the FastAPI backend is running on port 8003.');
       backendError.code = 'BACKEND_CONNECTION_FAILED';
       backendError.originalError = error;
       throw backendError;
@@ -245,7 +245,66 @@ export const dashboardAPI = {
   getRealTimeMetrics: () => api.get('/dashboard/real-time-metrics'),
   
   // AI and Analytics
-  getAIAnalysis: (countyData) => api.post('/dashboard/ai-analysis', countyData),
+  getAIAnalysis: (countyData) => {
+    // Simulate AI analysis with realistic dummy data
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const recommendations = [
+          {
+            type: 'Solar Microgrid',
+            confidence: 0.94,
+            priority: 'High',
+            description: 'Deploy distributed solar microgrids with battery storage to serve rural communities',
+            investment_required: Math.floor(Math.random() * 15000000) + 8000000,
+            expected_roi: '12-18 months',
+            impact: 'Electrify 2,500+ households, reduce carbon emissions by 450 tons/year',
+            technical_specs: '250kW solar array, 500kWh battery storage, smart grid integration'
+          },
+          {
+            type: 'Grid Extension',
+            confidence: 0.78,
+            priority: 'Medium',
+            description: 'Extend national grid infrastructure to underserved areas',
+            investment_required: Math.floor(Math.random() * 20000000) + 15000000,
+            expected_roi: '24-36 months',
+            impact: 'Connect 4,000+ households, support local businesses and healthcare',
+            technical_specs: '25km transmission lines, 3 substations, smart meters'
+          },
+          {
+            type: 'Hybrid Wind-Solar',
+            confidence: 0.86,
+            priority: 'High',
+            description: 'Combined wind and solar generation with advanced energy management',
+            investment_required: Math.floor(Math.random() * 12000000) + 10000000,
+            expected_roi: '15-24 months',
+            impact: 'Power 3,200+ homes, create 150 local jobs, 99.7% uptime reliability',
+            technical_specs: '180kW wind turbines, 320kW solar panels, AI-powered load balancing'
+          }
+        ];
+        
+        resolve({
+          data: {
+            analysis_timestamp: new Date().toISOString(),
+            county: countyData?.county_name || 'Selected County',
+            recommendations: recommendations,
+            ai_insights: {
+              energy_deficit: Math.floor(Math.random() * 40) + 20 + '%',
+              renewable_potential: Math.floor(Math.random() * 30) + 70 + '%',
+              optimal_solution: recommendations[0].type,
+              implementation_timeline: '6-12 months',
+              environmental_benefit: Math.floor(Math.random() * 500) + 300 + ' tons CO2 reduction/year'
+            },
+            next_steps: [
+              'Conduct detailed site assessment',
+              'Engage local stakeholders and communities',
+              'Secure financing and permits',
+              'Begin infrastructure deployment'
+            ]
+          }
+        });
+      }, 1500); // Simulate AI processing time
+    });
+  },
   getPredictiveAnalytics: (params) => 
     api.post('/dashboard/predictive-analytics', params),
   getEconomicImpact: (scenario) => 
@@ -386,8 +445,31 @@ export const minigridsAPI = {
     api.get(`/minigrids/${minigridId}/alert-history?days=${days}`),
   
   // Optimization and AI
-  getAIOptimization: (params) => 
-    api.post('/minigrids/ai-optimization', params),
+  getAIOptimization: (params) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          data: {
+            optimized_config: {
+              solar_capacity: Math.floor(Math.random() * 200) + 100,
+              wind_capacity: Math.floor(Math.random() * 100) + 50,
+              battery_capacity: Math.floor(Math.random() * 300) + 200,
+              efficiency_rating: Math.floor(Math.random() * 15) + 85 + '%'
+            },
+            ai_recommendations: [
+              'Increase battery storage by 25% for better load balancing',
+              'Install smart inverters for grid stability',
+              'Add predictive maintenance sensors',
+              'Implement demand response system'
+            ],
+            projected_savings: Math.floor(Math.random() * 30) + 20 + '%',
+            payback_period: Math.floor(Math.random() * 4) + 6 + ' years',
+            carbon_offset: Math.floor(Math.random() * 200) + 150 + ' tons/year'
+          }
+        });
+      }, 1200);
+    });
+  },
   getLoadForecast: (minigridId, hours = 24) => 
     api.get(`/minigrids/${minigridId}/load-forecast?hours=${hours}`),
   getGenerationForecast: (minigridId, hours = 24) => 
