@@ -1,35 +1,54 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Dashboard from './components/Dashboard';
 import Navigation from './components/Navigation';
 import Footer from './components/Footer';
 import Contact from './components/Contact';
 import Analytics from './components/Analytics';
 import Alerts from './components/Alerts';
+import Recommendations from './pages/Recommendations';
 import { testConnection } from './services/api';
 import './styles/App.css';
 
 function App() {
   const [isBackendConnected, setIsBackendConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [notifications, setNotifications] = useState([]);
   const [selectedCounty, setSelectedCounty] = useState(null);
-  const [analyticsData, setAnalyticsData] = useState(null);
-
+  const [analyticsData, setAnalyticsData] = useState({});
+  // Check backend connection on component mount
   useEffect(() => {
     const checkBackend = async () => {
-      const connected = await testConnection();
-      setIsBackendConnected(connected);
-      setIsLoading(false);
-      
-      if (connected) {
-        startNotificationSystem();
+      try {
+<<<<<<< Updated upstream
+        console.log('🔄 App: Testing backend connection...');
+        const connected = await testConnection();
+        console.log('✅ App: Backend connection result:', connected);
+        setIsBackendConnected(connected);
+        
+        if (connected) {
+          startNotificationSystem();
+        }
+      } catch (error) {
+        console.error('❌ App: Backend check failed:', error);
+        setIsBackendConnected(false);
+      } finally {
+        console.log('🚀 App: Setting isLoading to false');
+=======
+        const response = await testConnection();
+        setIsBackendConnected(response.connected);
+      } catch (error) {
+        console.error('Error connecting to backend:', error);
+        setIsBackendConnected(false);
+      } finally {
+>>>>>>> Stashed changes
+        setIsLoading(false);
       }
     };
-    
+
     checkBackend();
   }, []);
 
+<<<<<<< Updated upstream
   // Enhanced county selection handler
   const handleCountySelect = (countyData) => {
     console.log(`📍 App: County selected - ${countyData.name}`);
@@ -83,26 +102,28 @@ function App() {
     }, 60000); // Every minute
   };
 
+  // FIXED: Show loading screen only when isLoading is TRUE
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex items-center justify-center">
         <div className="text-center">
           <div className="loading-spinner mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold text-gray-700">Loading PowerGrid AI...</h2>
+          <h2 className="text-xl font-semibold text-gray-700">Loading UmemeAI...</h2>
           <p className="text-gray-500 mt-2">Initializing smart grid systems</p>
         </div>
       </div>
     );
   }
 
-  if (!isBackendConnected) {
+  // FIXED: Show connection error only when backend is not connected AND loading is done
+  if (!isBackendConnected && !isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
         <div className="text-center max-w-md">
           <div className="text-6xl mb-4">⚡</div>
           <h2 className="text-2xl font-bold text-red-600 mb-2">Backend Connection Failed</h2>
           <p className="text-gray-600 mb-6">
-            Please make sure your FastAPI backend is running on port 8003.
+            Please make sure your FastAPI backend is running on port 8000.
           </p>
           <button 
             onClick={() => window.location.reload()}
@@ -111,42 +132,45 @@ function App() {
             Retry Connection
           </button>
           <div className="mt-4 text-sm text-gray-500">
-            <p>Expected backend URL: http://localhost:8003</p>
-            <p className="mt-2">Run: <code>uvicorn main:app --reload --port 8003</code></p>
+            <p>Expected backend URL: http://localhost:8000</p>
+            <p className="mt-2">Run: <code>uvicorn main:app --reload --port 8000</code></p>
           </div>
         </div>
       </div>
     );
+=======
+  if (isLoading) {
+    return <div className="loading">Loading...</div>;
+>>>>>>> Stashed changes
   }
 
+  // FIXED: Only render the main app when loading is complete AND backend is connected
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 flex flex-col">
-        <Navigation 
-          notifications={notifications} 
-          selectedCounty={selectedCounty}
-          onClearCounty={clearCountySelection}
-        />
-        <main className="flex-1">
+      <div className="app">
+        <Navigation notifications={[]} />
+        <main className="main-content">
           <Routes>
             <Route path="/" element={
               <Dashboard 
-                onCountySelect={handleCountySelect}
+                isBackendConnected={isBackendConnected}
                 selectedCounty={selectedCounty}
-                onClearCounty={clearCountySelection}
+                onClearCounty={() => setSelectedCounty(null)}
+                analyticsData={analyticsData}
+                onCountySelect={setSelectedCounty}
               />
             } />
             <Route path="/analytics" element={
               <Analytics 
-                selectedCounty={selectedCounty}
-                onCountySelect={handleCountySelect}
-                onClearCounty={clearCountySelection}
-                analyticsData={analyticsData}
+                isBackendConnected={isBackendConnected}
+                onClearCounty={() => {}}
+                analyticsData={{}}
               />
             } />
             <Route path="/alerts" element={
-              <Alerts selectedCounty={selectedCounty} />
+              <Alerts notifications={[]} />
             } />
+            <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/contact" element={<Contact />} />
           </Routes>
         </main>

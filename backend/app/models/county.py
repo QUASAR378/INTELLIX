@@ -1,27 +1,44 @@
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from typing import Optional, List
+from datetime import datetime
 
-class County(BaseModel):
-    county_id: str
-    county_name: str
-    centroid: list[float]
+class CountyBase(BaseModel):
+    name: str
     population: int
-    current_kwh: int
-    blackout_freq: int
-    solar_irradiance: float
     hospitals: int
     schools: int
-    economic_activity_index: float
+    blackout_freq: float
+    economic_activity: float
     grid_distance: float
-    priority_score: float
-    recommended_solution: str
-    estimated_cost_kes: int
-    expected_impact: Dict[str, Any]
+    current_kwh: float
+    region: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
 
-class CountyResponse(County):
+class CountyCreate(CountyBase):
     pass
 
-class CountyUpdate(BaseModel):
-    priority_score: Optional[float] = None
-    recommended_solution: Optional[str] = None
-    estimated_cost_kes: Optional[int] = None
+class CountyUpdate(CountyBase):
+    name: Optional[str] = None
+    population: Optional[int] = None
+    hospitals: Optional[int] = None
+    schools: Optional[int] = None
+    blackout_freq: Optional[float] = None
+    economic_activity: Optional[float] = None
+    grid_distance: Optional[float] = None
+    current_kwh: Optional[float] = None
+
+class CountyInDB(CountyBase):
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
+
+class CountyResponse(CountyInDB):
+    pass
+
+class CountyListResponse(BaseModel):
+    count: int
+    data: List[CountyResponse]

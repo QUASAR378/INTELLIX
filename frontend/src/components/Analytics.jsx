@@ -34,6 +34,7 @@ import {
   RadialLinearScale,
 } from 'chart.js';
 import { analyticsAPI, dashboardAPI, countiesAPI } from '../services/api';
+import recommendationService from '../services/recommendationService';
 
 // Register Chart.js components
 ChartJS.register(
@@ -57,7 +58,55 @@ const Analytics = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCounty, setSelectedCounty] = useState(null);
   const [counties, setCounties] = useState([]);
-  const [aiRecommendations, setAiRecommendations] = useState(null);
+  const [aiRecommendations, setAiRecommendations] = useState({
+    loading: true,
+    error: null,
+    data: null
+  });
+
+  // Load recommendations when county changes
+  useEffect(() => {
+    const loadRecommendations = async () => {
+      if (!selectedCounty) return;
+      
+      setAiRecommendations(prev => ({ ...prev, loading: true, error: null }));
+      
+      try {
+        const countyData = {
+          county_name: selectedCounty.name,
+          population: selectedCounty.population || 0,
+          current_kwh: selectedCounty.current_kwh || 0,
+          // Add more fields as needed
+        };
+        
+        const recommendation = await recommendationService.getRecommendation(countyData);
+        
+        setAiRecommendations({
+          loading: false,
+          data: {
+            ai_recommendation: {
+              ...recommendation,
+              recommendations: recommendation.recommendations || [
+                'No specific recommendations available',
+                'Please check back later for updates'
+              ]
+            }
+          },
+          source: recommendation._source,
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        console.error('Failed to load recommendations:', error);
+        setAiRecommendations({
+          loading: false,
+          error: 'Failed to load recommendations',
+          data: null
+        });
+      }
+    };
+    
+    loadRecommendations();
+  }, [selectedCounty]);
   const [comparisonMode, setComparisonMode] = useState('national'); // 'national' or 'county'
 
   useEffect(() => {
@@ -760,7 +809,9 @@ const Analytics = () => {
                   Specific Recommendations
                 </h4>
                 <div className="space-y-3">
-                  {(aiRecommendations.ai_recommendation.recommendations || []).map((rec, index) => (
+                  {(aiRecommendations.data?.ai_recommendation?.recommendations || aiRecommendations.fallbackRecommendations || [
+                    'Loading recommendations...'
+                  ]).map((rec, index) => (
                     <div key={index} className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
                       <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                         {index + 1}
@@ -772,14 +823,14 @@ const Analytics = () => {
               </div>
 
               {/* AI Reasoning */}
-              {aiRecommendations.ai_recommendation.reasoning && (
+              {aiRecommendations.data?.ai_recommendation?.reasoning && (
                 <div className="mt-6 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
                   <h4 className="font-semibold text-indigo-800 mb-2 flex items-center">
                     <FiCpu className="w-4 h-4 mr-2" />
                     AI Analysis Reasoning
                   </h4>
                   <p className="text-indigo-700 text-sm leading-relaxed">
-                    {aiRecommendations.ai_recommendation.reasoning}
+                    {aiRecommendations.data.ai_recommendation.reasoning}
                   </p>
                 </div>
               )}
