@@ -6,7 +6,7 @@ Designed for seamless integration with existing systems
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import StandardScaler, LabelEncodercoun
+from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.cluster import KMeans
 from sklearn.model_selection import cross_val_score, train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
@@ -32,7 +32,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class CountyEnergyPlanner:
-    def __init__(self, config=None, db_connection=None):
+    def __init__(self, config: Optional[Dict] = None, db_connection=None):
         """
         Production-ready County Energy Planning Model
         
@@ -43,39 +43,37 @@ class CountyEnergyPlanner:
         - Flexible configuration
         - Integration-friendly API
         """
-        def __init__(self, config: Optional[Dict] = None):
-            """Initialize the County Energy Planner with configuration"""
-            self.config = self._load_default_config()
-            if config:
-                self.config.update(config)
-            
-            # Initialize models
-            self.priority_model = RandomForestRegressor(
-                n_estimators=self.config['model']['n_estimators'],
-                random_state=self.config['model']['random_state'],
-                max_depth=self.config['model']['max_depth'],
-                min_samples_split=self.config['model']['min_samples_split']
-            )
-            
-            self.scaler = StandardScaler()
-            self.cluster_model = KMeans(
-                n_clusters=self.config['clustering']['n_clusters'],
-                random_state=self.config['model']['random_state']
-            )
-            
-            # Model metadata
-            self.model_version = "1.0.0"
-            self.last_trained = None
-            self.feature_columns = None
-            self.is_trained = False
-            
-            # Results cache for performance
-            self._results_cache = {}
-            self._cache_timestamp = None
-            
-            logger.info(f"CountyEnergyPlanner initialized with version {self.model_version}")
+        self.config = self._load_default_config()
+        if config:
+            self.config.update(config)
         
-        def _load_default_config(self) -> Dict:
+        # Initialize models
+        self.priority_model = RandomForestRegressor(
+            n_estimators=self.config['model']['n_estimators'],
+            random_state=self.config['model']['random_state'],
+            max_depth=self.config['model']['max_depth'],
+            min_samples_split=self.config['model']['min_samples_split']
+        )
+        
+        self.scaler = StandardScaler()
+        self.cluster_model = KMeans(
+            n_clusters=self.config['clustering']['n_clusters'],
+            random_state=self.config['model']['random_state']
+        )
+        
+        # Model metadata
+        self.model_version = "1.0.0"
+        self.last_trained = None
+        self.feature_columns = None
+        self.is_trained = False
+        
+        # Results cache for performance
+        self._results_cache = {}
+        self._cache_timestamp = None
+        
+        logger.info(f"CountyEnergyPlanner initialized with version {self.model_version}")
+    
+    def _load_default_config(self) -> Dict:
             """Load default configuration"""
             return {
                 'model': {
@@ -102,10 +100,8 @@ class CountyEnergyPlanner:
                     'top_counties_count': 10
                 }
             }
-            
-
-        
-        def validate_input_data(self, data: pd.DataFrame) -> Tuple[bool, List[str]]:
+    
+    def validate_input_data(self, data: pd.DataFrame) -> Tuple[bool, List[str]]:
             """Validate input data structure and content"""
             errors = []
             
@@ -552,3 +548,6 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"Example execution failed: {str(e)}")
         raise
+
+# Alias for backwards compatibility
+EnergyPlanner = CountyEnergyPlanner

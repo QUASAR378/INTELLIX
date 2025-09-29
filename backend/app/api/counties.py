@@ -17,10 +17,9 @@ async def get_county(county_id: str):
     """Get specific county data with real Kenya energy data"""
     counties = await data_service.load_counties()
     
-    # Find the county by ID or name
+    # Find the county by name (case-insensitive)
     for county in counties:
-        if (county.county_id.lower() == county_id.lower() or 
-            county.county_name.lower() == county_id.lower()):
+        if county.county_name.lower() == county_id.lower().replace("_", " "):
             return county.dict()
     
     # If not found, raise 404
@@ -39,22 +38,37 @@ async def get_map_data():
     map_data = []
     for county in counties:
         # Determine deficit level based on priority score
-        priority_score = county.priority_score * 100  # Convert back to 0-100
-        if priority_score > 80:
+        priority_score = county.priority_score
+        if priority_score > 400:
             deficit_level = "high"
-        elif priority_score > 50:
+        elif priority_score > 200:
             deficit_level = "medium"
         else:
             deficit_level = "low"
         
+        # Determine solution type based on energy access score
+        if county.energy_access_score < 30:
+            solution_type = "solar_minigrid"
+        elif county.energy_access_score < 70:
+            solution_type = "hybrid_solution"
+        else:
+            solution_type = "grid_extension"
+        
+        # Estimate cost based on population and energy access
+        estimated_cost = county.population * (8000 if county.energy_access_score < 50 else 5000)
+        
         map_data.append({
-            "id": county.county_id.lower(),
+            "id": county.county_name.lower().replace(" ", "_").replace("'", ""),
             "name": county.county_name,
-            "coordinates": [county.centroid[0], county.centroid[1]],
+            "coordinates": [county.longitude or 36.8, county.latitude or -1.3],  # Default to Kenya center if no coords
             "priorityScore": int(priority_score),
             "deficitLevel": deficit_level,
-            "solutionType": county.recommended_solution,
-            "investment": county.estimated_cost_kes
+            "solutionType": solution_type,
+            "investment": estimated_cost,
+            "population": county.population,
+            "energyAccess": county.energy_access_score,
+            "solarPotential": county.avg_solar_irradiance,
+            "reliabilityScore": county.avg_reliability_score
         })
     
     return map_data

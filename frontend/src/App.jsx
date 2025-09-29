@@ -19,10 +19,9 @@ function App() {
   useEffect(() => {
     const checkBackend = async () => {
       try {
-<<<<<<< Updated upstream
-        console.log('🔄 App: Testing backend connection...');
+        console.log(' App: Testing backend connection...');
         const connected = await testConnection();
-        console.log('✅ App: Backend connection result:', connected);
+        console.log(' App: Backend connection result:', connected);
         setIsBackendConnected(connected);
         
         if (connected) {
@@ -33,14 +32,6 @@ function App() {
         setIsBackendConnected(false);
       } finally {
         console.log('🚀 App: Setting isLoading to false');
-=======
-        const response = await testConnection();
-        setIsBackendConnected(response.connected);
-      } catch (error) {
-        console.error('Error connecting to backend:', error);
-        setIsBackendConnected(false);
-      } finally {
->>>>>>> Stashed changes
         setIsLoading(false);
       }
     };
@@ -48,7 +39,6 @@ function App() {
     checkBackend();
   }, []);
 
-<<<<<<< Updated upstream
   // Enhanced county selection handler
   const handleCountySelect = (countyData) => {
     console.log(`📍 App: County selected - ${countyData.name}`);
@@ -132,16 +122,16 @@ function App() {
             Retry Connection
           </button>
           <div className="mt-4 text-sm text-gray-500">
-            <p>Expected backend URL: http://localhost:8000</p>
+            <p>Expected backend URL: http://localhost:8003</p>
             <p className="mt-2">Run: <code>uvicorn main:app --reload --port 8000</code></p>
           </div>
         </div>
       </div>
     );
-=======
+  }
+
   if (isLoading) {
     return <div className="loading">Loading...</div>;
->>>>>>> Stashed changes
   }
 
   // FIXED: Only render the main app when loading is complete AND backend is connected

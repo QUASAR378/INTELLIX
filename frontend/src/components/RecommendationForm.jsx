@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import recommendationAPI from '../services/recommendationAPI';
 
 const RecommendationForm = () => {
@@ -17,6 +17,11 @@ const RecommendationForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [modelInfo, setModelInfo] = useState(null);
+  
+  // Autocomplete state
+  const [counties, setCounties] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [loadingCounty, setLoadingCounty] = useState(false);
 
   useEffect(() => {
     // Fetch model info when component mounts
@@ -34,9 +39,12 @@ const RecommendationForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // Skip county_name as it's handled separately
+    if (name === 'county_name') return;
+    
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'county_name' ? value : parseFloat(value)
+      [name]: parseFloat(value) || 0
     }));
   };
 
@@ -56,6 +64,82 @@ const RecommendationForm = () => {
     }
   };
 
+  // Search counties for autocomplete
+  const searchCounties = useCallback(async (query) => {
+    if (query.length < 2) {
+      setCounties([]);
+      setShowDropdown(false);
+      return;
+    }
+    
+    try {
+      const response = await fetch(`http://localhost:8003/api/recommendations/counties/search?q=${encodeURIComponent(query)}`);
+      const data = await response.json();
+      setCounties(data.counties || []);
+      setShowDropdown(data.counties && data.counties.length > 0);
+    } catch (err) {
+      console.error('Error searching counties:', err);
+      setCounties([]);
+      setShowDropdown(false);
+    }
+  }, []);
+
+  // Fetch county data and auto-fill form
+  const fetchCountyData = useCallback(async (countyName) => {
+    if (!countyName) return;
+    
+    setLoadingCounty(true);
+    try {
+      const response = await fetch(`http://localhost:8003/api/recommendations/counties/${encodeURIComponent(countyName)}/data`);
+      if (response.ok) {
+        const countyData = await response.json();
+        setFormData(prev => ({
+          ...prev,
+          ...countyData
+        }));
+      }
+    } catch (err) {
+      console.error('Error fetching county data:', err);
+    } finally {
+      setLoadingCounty(false);
+    }
+  }, []);
+
+  // Handle county name input change
+  const handleCountyNameChange = (e) => {
+    const value = e.target.value;
+    setFormData(prev => ({
+      ...prev,
+      county_name: value
+    }));
+    
+    // Search for counties as user types
+    searchCounties(value);
+  };
+
+  // Handle county selection from dropdown
+  const handleCountySelect = (countyName) => {
+    setFormData(prev => ({
+      ...prev,
+      county_name: countyName
+    }));
+    setShowDropdown(false);
+    setCounties([]);
+    
+    // Auto-fill form with county data
+    fetchCountyData(countyName);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setShowDropdown(false);
+    };
+    
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-gray-800">County Energy Recommendation</h2>
@@ -70,17 +154,47 @@ const RecommendationForm = () => {
       )}
       
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
+          <p className="text-sm text-green-800">
+            💡 <strong>Tip:</strong> Start typing a Kenya county name below and the form will automatically 
+            populate with real data including population, hospitals, schools, and energy metrics!
+          </p>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">County Name</label>
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700">
+              County Name
+              {loadingCounty && <span className="text-blue-500 text-sm ml-2">(Loading data...)</span>}
+            </label>
             <input
               type="text"
               name="county_name"
               value={formData.county_name}
-              onChange={handleChange}
+              onChange={handleCountyNameChange}
+              onClick={(e) => e.stopPropagation()}
+              placeholder="Start typing county name..."
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               required
             />
+            {showDropdown && counties.length > 0 && (
+              <div className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg border border-gray-200">
+                <ul className="max-h-60 rounded-md ring-1 ring-black ring-opacity-5 overflow-auto">
+                  {counties.map((county) => (
+                    <li
+                      key={county}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCountySelect(county);
+                      }}
+                      className="cursor-pointer select-none relative py-2 pl-3 pr-9 text-gray-900 hover:bg-blue-100 transition-colors"
+                    >
+                      <span className="block truncate">{county}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
           
           <div>

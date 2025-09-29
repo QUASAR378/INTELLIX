@@ -1,16 +1,7 @@
 # backend/app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-<<<<<<< Updated upstream
-from app.api import counties, minigrids, dashboard, analytics
-=======
-from app.api import (
-    counties_router,
-    minigrids_router,
-    dashboard_router,
-    recommendations_router
-)
->>>>>>> Stashed changes
+from app.api import counties, minigrids, dashboard, analytics, county_recommendations
 from config.settings import settings
 
 app = FastAPI(
@@ -29,17 +20,11 @@ app.add_middleware(
 )
 
 # Include routers
-<<<<<<< Updated upstream
 app.include_router(counties.router, prefix="/api/counties", tags=["counties"])
 app.include_router(minigrids.router, prefix="/api/minigrids", tags=["minigrids"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
-=======
-app.include_router(counties_router, prefix="/api/counties", tags=["counties"])
-app.include_router(minigrids_router, prefix="/api/minigrids", tags=["minigrids"])
-app.include_router(dashboard_router, prefix="/api/dashboard", tags=["dashboard"])
-app.include_router(recommendations_router, prefix="/api/recommendations", tags=["recommendations"])
->>>>>>> Stashed changes
+app.include_router(county_recommendations.router, prefix="/api/recommendations", tags=["recommendations"])
 
 @app.get("/")
 async def root():
@@ -52,6 +37,7 @@ async def root():
             "dashboard": "/api/dashboard/",
             "minigrids": "/api/minigrids/",
             "analytics": "/api/analytics/",
+            "recommendations": "/api/recommendations/",
             "docs": "/docs"
         }
     }

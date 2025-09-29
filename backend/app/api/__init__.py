@@ -2,7 +2,7 @@
 from .counties import router as counties_router
 from .minigrids import router as minigrids_router
 from .dashboard import router as dashboard_router
-from .recommendations import router as recommendations_router
+# from .recommendations import router as recommendations_router  # Temporarily disabled
 
 # This makes it easier to import routers in other parts of the application
 __all__ = [

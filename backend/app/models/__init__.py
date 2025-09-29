@@ -8,7 +8,7 @@ from .county import (
     CountyListResponse
 )
 
-from .county_energy_model import CountyEnergyPlanner
+# from .county_energy_model import CountyEnergyPlanner  # Temporarily disabled
 
 # This makes it easier to import models in other parts of the application
 __all__ = [

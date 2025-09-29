@@ -1,7 +1,7 @@
 import api from './api';
 
 // Use the same base URL as other API calls (assuming your FastAPI runs on port 8000)
-const RECOMMENDATION_BASE_URL = 'http://localhost:8000';
+const RECOMMENDATION_BASE_URL = 'http://localhost:8003';
 
 const recommendationAPI = {
   // Get recommendations for a county

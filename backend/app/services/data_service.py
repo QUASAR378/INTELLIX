@@ -59,21 +59,17 @@ class DataService:
                 estimated_cost = population * cost_per_person
                 
                 county = County(
-                    county_id=county_data.get('county_name', '').replace(' ', ''),
                     county_name=county_data.get('county_name', ''),
-                    centroid=self._get_county_centroid(county_data.get('county_name', '')),
                     population=county_data.get('population', 0),
-                    current_kwh=population * 1000,  # Estimate based on population
-                    blackout_freq=100 - county_data.get('avg_reliability_score', 50),
-                    solar_irradiance=solar_irradiance,
                     hospitals=county_data.get('hospitals', 0),
                     schools=county_data.get('schools', 0),
-                    economic_activity_index=county_data.get('energy_access_score', 50) / 100.0,
-                    grid_distance=self._estimate_grid_distance(county_data.get('county_name', '')),
-                    priority_score=priority_score,
-                    recommended_solution=recommended_solution,
-                    estimated_cost_kes=estimated_cost,
-                    expected_impact={"electrification_increase_pct": max(10, 100 - energy_access)}
+                    poverty_index=county_data.get('poverty_index', 0),
+                    avg_solar_irradiance=county_data.get('avg_solar_irradiance', 0),
+                    avg_reliability_score=county_data.get('avg_reliability_score', 0),
+                    energy_access_score=county_data.get('energy_access_score', 0),
+                    renewable_potential_score=county_data.get('renewable_potential_score', 0),
+                    priority_score=county_data.get('priority_score', 0),
+                    timestamp=county_data.get('timestamp', '')
                 )
                 counties.append(county)
             
