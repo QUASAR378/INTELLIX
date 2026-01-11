@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8003/api';
+// Auto-detect Codespaces or use localhost
+const API_BASE_URL = window.location.hostname.includes('github.dev')
+  ? `https://${window.location.hostname.replace(/5173|5174/, '8002')}/api`
+  : 'http://localhost:8002/api';
 
 // Create axios instance with robust configuration
 const api = axios.create({
@@ -245,66 +248,7 @@ export const dashboardAPI = {
   getRealTimeMetrics: () => api.get('/dashboard/real-time-metrics'),
   
   // AI and Analytics
-  getAIAnalysis: (countyData) => {
-    // Simulate AI analysis with realistic dummy data
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const recommendations = [
-          {
-            type: 'Solar Microgrid',
-            confidence: 0.94,
-            priority: 'High',
-            description: 'Deploy distributed solar microgrids with battery storage to serve rural communities',
-            investment_required: Math.floor(Math.random() * 15000000) + 8000000,
-            expected_roi: '12-18 months',
-            impact: 'Electrify 2,500+ households, reduce carbon emissions by 450 tons/year',
-            technical_specs: '250kW solar array, 500kWh battery storage, smart grid integration'
-          },
-          {
-            type: 'Grid Extension',
-            confidence: 0.78,
-            priority: 'Medium',
-            description: 'Extend national grid infrastructure to underserved areas',
-            investment_required: Math.floor(Math.random() * 20000000) + 15000000,
-            expected_roi: '24-36 months',
-            impact: 'Connect 4,000+ households, support local businesses and healthcare',
-            technical_specs: '25km transmission lines, 3 substations, smart meters'
-          },
-          {
-            type: 'Hybrid Wind-Solar',
-            confidence: 0.86,
-            priority: 'High',
-            description: 'Combined wind and solar generation with advanced energy management',
-            investment_required: Math.floor(Math.random() * 12000000) + 10000000,
-            expected_roi: '15-24 months',
-            impact: 'Power 3,200+ homes, create 150 local jobs, 99.7% uptime reliability',
-            technical_specs: '180kW wind turbines, 320kW solar panels, AI-powered load balancing'
-          }
-        ];
-        
-        resolve({
-          data: {
-            analysis_timestamp: new Date().toISOString(),
-            county: countyData?.county_name || 'Selected County',
-            recommendations: recommendations,
-            ai_insights: {
-              energy_deficit: Math.floor(Math.random() * 40) + 20 + '%',
-              renewable_potential: Math.floor(Math.random() * 30) + 70 + '%',
-              optimal_solution: recommendations[0].type,
-              implementation_timeline: '6-12 months',
-              environmental_benefit: Math.floor(Math.random() * 500) + 300 + ' tons CO2 reduction/year'
-            },
-            next_steps: [
-              'Conduct detailed site assessment',
-              'Engage local stakeholders and communities',
-              'Secure financing and permits',
-              'Begin infrastructure deployment'
-            ]
-          }
-        });
-      }, 1500); // Simulate AI processing time
-    });
-  },
+  getAIAnalysis: (countyData) => api.post('/dashboard/ai-analysis', countyData),
   getPredictiveAnalytics: (params) => 
     api.post('/dashboard/predictive-analytics', params),
   getEconomicImpact: (scenario) => 

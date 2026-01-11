@@ -20,7 +20,7 @@ class Settings:
     # FastAPI Settings
     API_HOST: str = os.getenv("API_HOST", "0.0.0.0")
     API_PORT: int = int(os.getenv("API_PORT", "8002"))
-    DEBUG: bool = os.getenv("DEBUG", "true").lower() == "true"
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")  # development or production
     
     # Database (for future use)
     DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
@@ -33,6 +33,7 @@ class Settings:
         "http://127.0.0.1:5174",
         "http://localhost:3000",  # Production
         "http://127.0.0.1:3000",
+        "https://*.app.github.dev",  # GitHub Codespaces
     ]
     
     @property
@@ -51,6 +52,19 @@ class Settings:
             return "Gemini Available"
         else:
             return "Using Rule-Based Fallback"
+    
+    @property
+    def cors_origins(self) -> list:
+        """Return appropriate CORS origins based on environment"""
+        if self.ENVIRONMENT == "production":
+            # In production, only allow specific domains
+            return [
+                "https://yourdomain.com",
+                "https://www.yourdomain.com",
+            ]
+        else:
+            # Development: allow localhost variations
+            return self.ALLOWED_ORIGINS
 
 # Global settings instance
 settings = Settings()

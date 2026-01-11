@@ -3,12 +3,69 @@ from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
 import logging
 from app.services.data_service import DataService
+from app.utils.recommendation_engine import RuleBasedEngine
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-# Initialize data service
+# Initialize data service and recommendation engine
 data_service = DataService()
+rule_engine = RuleBasedEngine()
+
+class CountyData(BaseModel):
+    county_name: str = Field(..., description="Name of the county")
+    population: int = Field(..., gt=0, description="Population count")
+    hospitals: int = Field(0, ge=0, description="Number of healthcare facilities")
+    schools: int = Field(0, ge=0, description="Number of educational institutions")
+    blackout_freq: float = Field(0.0, ge=0, le=100, description="Frequency of blackouts (0-100)")
+    economic_activity: float = Field(0.0, ge=0, le=100, description="Economic activity index (0-100)")
+    grid_distance: float = Field(0.0, ge=0, description="Distance to nearest grid (km)")
+    current_kwh: float = Field(0.0, ge=0, description="Current energy consumption in kWh")
+    solar_irradiance: Optional[float] = Field(None, ge=0, description="Solar irradiance (kWh/m²/day)")
+    avg_wind_speed: Optional[float] = Field(None, ge=0, description="Average wind speed (m/s)")
+    land_availability: Optional[float] = Field(None, ge=0, description="Available land (km²)")
+    population_density: Optional[float] = Field(None, ge=0, description="Population density (people/km²)")
+
+@router.post("/")
+async def get_recommendations(county_data: CountyData):
+    """
+    Get energy recommendations for a county using rule-based engine.
+    """
+    try:
+        input_data = county_data.dict()
+        raw_result = rule_engine.get_recommendation(input_data)
+        
+        # Transform to match frontend format
+        result = {
+            "priority_score": raw_result.get('confidence', 0.7) * 10,  # Scale to 0-10
+            "recommended_solutions": [
+                raw_result.get('solution', 'grid_extension').replace('_', ' ').title(),
+                raw_result.get('reason', 'Standard recommendation')
+            ],
+            "estimated_costs": {
+                "total_implementation": raw_result.get('estimated_cost', 1800000),
+                "maintenance_annual": raw_result.get('estimated_cost', 1800000) * 0.05
+            },
+            "timeline": [
+                "Phase 1: Planning and Design (3-6 months)",
+                "Phase 2: Infrastructure Development (12-18 months)",
+                "Phase 3: Testing and Commissioning (2-3 months)",
+                f"Expected ROI: {raw_result.get('roi_years', 7)} years"
+            ],
+            "confidence": raw_result.get('confidence', 0.7),
+            "source": "rule_engine"
+        }
+        
+        logger.info(f"Generated recommendations for {county_data.county_name}")
+        
+        return {
+            "status": "success",
+            "data": result,
+            "source": "rule_engine"
+        }
+    except Exception as e:
+        logger.error(f"Error generating recommendations: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate recommendations: {str(e)}")
 
 @router.get("/counties/search")
 async def search_counties(q: str = ""):

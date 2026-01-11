@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip as ChartTooltip, Legend } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import AIAnalysis from './AIAnalysis';
+import Tooltip from './Tooltip';
 import { 
   FiGrid, 
   FiZap, 
@@ -14,13 +15,14 @@ import {
   FiWifi,
   FiAlertOctagon,
   FiBook,
-  FiShoppingBag,
   FiTarget,
-  FiTrendingUp
+  FiTrendingUp,
+  FiUsers,
+  FiBarChart2
 } from 'react-icons/fi';
 
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, ChartTooltip, Legend);
 
 const CountyDetails = ({ county }) => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -70,53 +72,48 @@ const CountyDetails = ({ county }) => {
 
 
   return (
-    <div className="space-y-8">
-      {/* Header Section */}
-      <div className={`energy-card ${isAnimated ? 'animate-fade-in' : 'opacity-0'}`}>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-4">
-            <FiHome className="w-12 h-12 text-blue-600" />
-            <div>
-              <h1 className="text-3xl font-bold text-gray-800">{county.name || county.county_name} County</h1>
-              <p className="text-lg text-gray-600">{county.region || 'Kenya'} Region</p>
-              <div className="flex items-center space-x-4 mt-2">
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  (county.priority_score || 50) >= 80 ? 'bg-red-100 text-red-800' :
-                  (county.priority_score || 50) >= 60 ? 'bg-amber-100 text-amber-800' :
-                  'bg-green-100 text-green-800'
-                }`}>
-                  Priority Score: {county.priority_score || 'Calculating...'}/100
-                </span>
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
-                  {county.recommended_solution ? county.recommended_solution.replace('_', ' ').toUpperCase() : 'MINI-GRID'}
-                </span>
-              </div>
+    <div className="space-y-4">
+      {/* Compact Header Section */}
+      <div className={`bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-lg p-5 ${isAnimated ? 'animate-fade-in' : 'opacity-0'}`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">{county.name || county.county_name} County</h1>
+            <div className="flex items-center space-x-3">
+              <span className="text-sm text-gray-500">{county.region || 'Kenya'} Region</span>
+              <span className="text-gray-300">•</span>
+              <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
+                (county.priority_score || 50) >= 80 ? 'bg-red-100 text-red-700' :
+                (county.priority_score || 50) >= 60 ? 'bg-orange-100 text-orange-700' :
+                'bg-green-100 text-green-700'
+              }`}>
+                Priority {county.priority_score || 'N/A'}
+              </span>
             </div>
           </div>
           
-          <div className="text-right">
-            <div className="text-2xl font-bold text-green-600">
+          <div className="text-right bg-green-50 px-4 py-3 rounded-lg border border-green-200">
+            <div className="text-2xl font-bold text-green-700">
               ${((county.investment_needed_usd || estimatedDemand * 5000) / 1000000).toFixed(1)}M
             </div>
-            <div className="text-sm text-gray-600">Investment Required</div>
+            <div className="text-xs text-green-600 font-medium">Est. Investment</div>
           </div>
         </div>
       </div>
 
-      {/* Tabs Navigation */}
-      <div className="flex space-x-2 bg-white rounded-lg p-2 shadow-md">
+      {/* Compact Tabs Navigation */}
+      <div className="flex space-x-1 bg-white border border-gray-200 rounded-lg p-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center space-x-2 px-4 py-2 rounded-md font-medium transition-all ${
+            className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2.5 rounded-md font-medium transition-all text-sm ${
               activeTab === tab.id
-                ? 'bg-energy-primary text-white shadow-md'
-                : 'text-gray-600 hover:text-energy-primary hover:bg-green-50'
+                ? 'bg-green-600 text-white shadow-sm'
+                : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
-            <tab.icon className="w-5 h-5" />
-            <span className="ml-2">{tab.label}</span>
+            <tab.icon className="w-4 h-4" />
+            <span className="hidden sm:inline">{tab.label}</span>
           </button>
         ))}
       </div>
@@ -133,53 +130,58 @@ const CountyDetails = ({ county }) => {
                 <FiActivity className="w-5 h-5 mr-2" />
                 Key Metrics
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <FiHome className="w-6 h-6 text-blue-600" />
-                    <span className="text-gray-600 font-medium">Population</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <FiUsers className="w-5 h-5 text-green-600" />
+                    <span className="text-gray-600 text-sm font-medium">Population</span>
+                    <Tooltip text="Number of people living in this county" position="right" />
                   </div>
-                  <div className="text-2xl font-bold text-gray-800">
+                  <div className="text-xl font-bold text-gray-900">
                     {(county.population || 0).toLocaleString()}
                   </div>
                 </div>
                 
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <FiZap className="w-6 h-6 text-red-600" />
-                    <span className="text-gray-600 font-medium">Energy Deficit</span>
+                <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <FiZap className="w-5 h-5 text-green-600" />
+                    <span className="text-gray-600 text-sm font-medium">Energy Deficit</span>
+                    <Tooltip text="Gap between electricity demand and current supply in megawatt-hours" position="right" />
                   </div>
-                  <div className="text-2xl font-bold text-red-600">
+                  <div className="text-xl font-bold text-gray-900">
                     {(estimatedDeficit / 1000).toFixed(1)} MWh
                   </div>
                 </div>
                 
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <FiWifi className="w-6 h-6 text-gray-600" />
-                    <span className="text-gray-600 font-medium">Grid Distance</span>
+                <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <FiWifi className="w-5 h-5 text-green-600" />
+                    <span className="text-gray-600 text-sm font-medium">Grid Distance</span>
+                    <Tooltip text="Distance from the nearest main power grid connection point" position="right" />
                   </div>
-                  <div className="text-2xl font-bold text-gray-800">
+                  <div className="text-xl font-bold text-gray-900">
                     {county.grid_distance || 0} km
                   </div>
                 </div>
                 
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <FiSun className="w-6 h-6 text-energy-primary" />
-                    <span className="text-gray-600 font-medium">Solar Irradiance</span>
+                <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <FiSun className="w-5 h-5 text-green-600" />
+                    <span className="text-gray-600 text-sm font-medium">Solar Potential</span>
+                    <Tooltip text="Average daily sunlight available for solar panels, measured in kilowatt-hours per square meter" position="right" />
                   </div>
-                  <div className="text-2xl font-bold text-energy-primary">
+                  <div className="text-xl font-bold text-gray-900">
                     {(county.solar_irradiance || 0).toFixed(1)} kWh/m²
                   </div>
                 </div>
                 
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <div className="flex items-center space-x-3 mb-3">
-                    <FiAlertOctagon className="w-6 h-6 text-amber-600" />
-                    <span className="text-gray-600 font-medium">Blackout Frequency</span>
+                <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <FiAlertOctagon className="w-5 h-5 text-green-600" />
+                    <span className="text-gray-600 text-sm font-medium">Power Outages</span>
+                    <Tooltip text="Number of electricity blackouts experienced per month" position="right" />
                   </div>
-                  <div className="text-2xl font-bold text-amber-600">
+                  <div className="text-xl font-bold text-gray-900">
                     {county.blackout_freq || county.blackout_frequency || 0}/month
                   </div>
                 </div>
@@ -189,37 +191,30 @@ const CountyDetails = ({ county }) => {
             {/* Infrastructure Card - Full Width */}
             <div className="energy-card">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <FiGrid className="w-5 h-5 mr-2" />
+                <FiGrid className="w-5 h-5 mr-2 text-green-600" />
                 Infrastructure
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="infrastructure-stat-card text-center bg-blue-50 border-blue-200">
-                  <FiHome className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-blue-600 mb-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="text-center bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <FiActivity className="w-5 h-5 text-green-600 mx-auto mb-2" />
+                  <div className="text-xl font-bold text-gray-900 mb-1">
                     {county.hospitals || 0}
                   </div>
-                  <div className="text-sm font-medium text-blue-700">Hospitals</div>
+                  <div className="text-xs font-medium text-gray-600">Hospitals</div>
                 </div>
-                <div className="infrastructure-stat-card text-center bg-purple-50 border-purple-200">
-                  <FiBook className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-purple-600 mb-1">
+                <div className="text-center bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <FiBook className="w-5 h-5 text-green-600 mx-auto mb-2" />
+                  <div className="text-xl font-bold text-gray-900 mb-1">
                     {county.schools || 0}
                   </div>
-                  <div className="text-sm font-medium text-purple-700">Schools</div>
+                  <div className="text-xs font-medium text-gray-600">Schools</div>
                 </div>
-                <div className="infrastructure-stat-card text-center bg-green-50 border-green-200">
-                  <FiHome className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-green-600 mb-1">
+                <div className="text-center bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <FiHome className="w-5 h-5 text-green-600 mx-auto mb-2" />
+                  <div className="text-xl font-bold text-gray-900 mb-1">
                     {Math.floor((county.population || 0) / 4.5).toLocaleString()}
                   </div>
-                  <div className="text-sm font-medium text-green-700">Est. Households</div>
-                </div>
-                <div className="infrastructure-stat-card text-center bg-orange-50 border-orange-200">
-                  <FiShoppingBag className="w-6 h-6 text-orange-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-orange-600 mb-1">
-                    {Math.floor((county.population || 0) / 10000)}
-                  </div>
-                  <div className="text-sm font-medium text-orange-700">Est. Markets</div>
+                  <div className="text-xs font-medium text-gray-600">Est. Households</div>
                 </div>
               </div>
             </div>
@@ -230,14 +225,14 @@ const CountyDetails = ({ county }) => {
 
         {/* Energy Analysis Tab */}
         {activeTab === 'energy' && (
-          <div className="space-y-8">
-            {/* Energy Chart - Full Width */}
-            <div className="energy-card">
-              <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
-                <FiZap className="w-5 h-5 mr-2" />
+          <div className="space-y-6">
+            {/* Energy Chart */}
+            <div className="bg-white border border-gray-200 rounded-lg p-5">
+              <h3 className="text-base font-semibold text-gray-900 mb-4 flex items-center">
+                <FiZap className="w-4 h-4 mr-1.5" />
                 Energy Supply vs Demand
               </h3>
-              <div className="h-96">
+              <div className="h-80">
                 <Bar 
                   data={energyChartData}
                   options={{
@@ -263,42 +258,45 @@ const CountyDetails = ({ county }) => {
 
             {/* Energy Efficiency Scores - Full Width */}
             <div className="energy-card">
-              <h3 className="text-xl font-semibold text-gray-800 mb-6">📈 Energy Efficiency Scores</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-6 flex items-center">
+                <FiBarChart2 className="w-5 h-5 mr-2 text-green-600" />
+                Energy Efficiency Scores
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-3">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-yellow-600 mb-2">
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
                       {Math.round((county.solar_irradiance || 5.5) * 10)}%
                     </div>
-                    <div className="text-lg font-medium text-gray-700">Solar Potential</div>
+                    <div className="text-sm font-medium text-gray-600">Solar Potential</div>
                   </div>
                   <ProgressBar 
                     label="" 
                     value={(county.solar_irradiance || 5.5) * 10} 
-                    color="bg-yellow-500"
+                    color="bg-green-500"
                   />
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600 mb-2">
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
                       {Math.round(Math.max(0, 100 - (county.grid_distance || 50)))}%
                     </div>
-                    <div className="text-lg font-medium text-gray-700">Grid Accessibility</div>
+                    <div className="text-sm font-medium text-gray-600">Grid Accessibility</div>
                   </div>
                   <ProgressBar 
                     label="" 
                     value={Math.max(0, 100 - (county.grid_distance || 50))} 
-                    color="bg-blue-500"
+                    color="bg-green-500"
                   />
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600 mb-2">
+                    <div className="text-2xl font-bold text-gray-900 mb-1">
                       {Math.round((county.current_access || 0.4) * 100)}%
                     </div>
-                    <div className="text-lg font-medium text-gray-700">Supply Adequacy</div>
+                    <div className="text-sm font-medium text-gray-600">Supply Adequacy</div>
                   </div>
                   <ProgressBar 
                     label="" 
@@ -332,16 +330,6 @@ const CountyDetails = ({ county }) => {
 };
 
 // Helper Components
-const MetricRow = ({ label, value, Icon, valueColor = "text-gray-800" }) => (
-  <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-    <div className="flex items-center space-x-2">
-      <Icon className="w-5 h-5 text-gray-600" />
-      <span className="text-gray-600">{label}</span>
-    </div>
-    <span className={`font-semibold ${valueColor}`}>{value}</span>
-  </div>
-);
-
 const ProgressBar = ({ label, value, color }) => (
   <div>
     <div className="flex justify-between text-sm mb-1">
@@ -356,41 +344,5 @@ const ProgressBar = ({ label, value, color }) => (
     </div>
   </div>
 );
-
-const TimelineStep = ({ step, title, duration }) => (
-  <div className="flex items-center space-x-3">
-    <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
-      {step}
-    </div>
-    <div className="flex-1">
-      <div className="font-medium text-gray-800">{title}</div>
-      <div className="text-xs text-gray-600">{duration}</div>
-    </div>
-  </div>
-);
-
-// Helper Functions
-const getSolutionDetails = (solutionType) => {
-  const solutions = {
-    solar_minigrid: {
-      name: "Solar Mini-Grid System",
-      description: "Standalone solar power system with battery storage, perfect for remote areas with high solar potential."
-    },
-    grid_extension: {
-      name: "National Grid Extension",
-      description: "Extend the national power grid to connect underserved communities with reliable electricity."
-    },
-    hybrid_solution: {
-      name: "Hybrid Energy System",
-      description: "Combination of solar mini-grids with grid connectivity for optimal reliability and cost-effectiveness."
-    },
-    grid_optimization: {
-      name: "Grid Optimization",
-      description: "Improve existing grid infrastructure efficiency and reduce transmission losses."
-    }
-  };
-  
-  return solutions[solutionType] || { name: "Custom Solution", description: "Tailored energy solution based on specific needs." };
-};
 
 export default CountyDetails;

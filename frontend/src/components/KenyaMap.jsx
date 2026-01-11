@@ -346,7 +346,9 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
       low: '#10B981',      // Green for low deficit
     };
 
-    const color = colors[county.deficitLevel] || '#6B7280';
+    // Ensure deficitLevel is lowercase for proper color mapping
+    const deficitLevel = (county.deficitLevel || 'low').toLowerCase();
+    const color = colors[deficitLevel] || '#6B7280';
     const isAIUpdated = county.ai_updated;
     const borderColor = isAIUpdated ? '#8B5CF6' : 'white'; // Purple border for AI-updated counties
     const borderWidth = isAIUpdated ? '4px' : '3px';
@@ -512,10 +514,17 @@ const KenyaMap = ({ onCountySelect, aiRecommendations, isAnalyzing }) => {
       </div>
 
       <MapContainer
-        center={[0.0236, 37.9062]}  // Center of Kenya
-        zoom={6}
+        center={[0.5, 37.5]}  // Center of Kenya
+        zoom={7}
+        minZoom={6}
+        maxZoom={7}
         style={{ height: '100%', width: '100%' }}
         ref={mapRef}
+        scrollWheelZoom={false}
+        doubleClickZoom={false}
+        dragging={true}
+        zoomControl={false}
+        touchZoom={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

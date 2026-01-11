@@ -21,8 +21,8 @@ const Recommendations = () => {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <div className="flex items-center">
-                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <span className="text-blue-600 font-bold">1</span>
+                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                  <span className="text-green-600 font-bold">1</span>
                 </div>
                 <h3 className="ml-3 text-lg font-medium text-gray-900">Enter County Data</h3>
               </div>
@@ -33,8 +33,8 @@ const Recommendations = () => {
             
             <div className="space-y-2">
               <div className="flex items-center">
-                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <span className="text-blue-600 font-bold">2</span>
+                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                  <span className="text-green-600 font-bold">2</span>
                 </div>
                 <h3 className="ml-3 text-lg font-medium text-gray-900">Get AI Analysis</h3>
               </div>
@@ -45,8 +45,8 @@ const Recommendations = () => {
             
             <div className="space-y-2">
               <div className="flex items-center">
-                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                  <span className="text-blue-600 font-bold">3</span>
+                <div className="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                  <span className="text-green-600 font-bold">3</span>
                 </div>
                 <h3 className="ml-3 text-lg font-medium text-gray-900">Implement Solutions</h3>
               </div>

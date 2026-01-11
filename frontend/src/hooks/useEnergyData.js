@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { countiesAPI } from '../services/api';
 
 export const useEnergyData = () => {
   const [counties, setCounties] = useState([]);
@@ -9,15 +10,13 @@ export const useEnergyData = () => {
     const fetchCounties = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/data/dummy/counties.json');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        setCounties(data);
+        const response = await countiesAPI.getAll();
+        const data = response.data || [];
+        setCounties(Array.isArray(data) ? data : []);
       } catch (err) {
-        setError(err.message);
+        setError(err.message || 'Failed to load county data');
         console.error('Error fetching counties:', err);
+        setCounties([]);
       } finally {
         setLoading(false);
       }

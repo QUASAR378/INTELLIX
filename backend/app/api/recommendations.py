@@ -12,6 +12,7 @@ import logging
 from app.models.county_energy_model import EnergyPlanner
 from app.utils.recommendation_engine import RuleBasedEngine
 from app.services.data_service import DataService
+from app.services.ai_agent import ai_agent, CountyAnalysisRequest
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -43,7 +44,7 @@ def get_cache_key(county_data: Dict) -> str:
     """Generate a cache key from county data."""
     return f"{county_data['county_name']}_{county_data['population']}_{county_data['current_kwh']}"
 
-@router.post("/recommendations")
+@router.post("/")
 async def get_recommendations(
     county_data: CountyData,
     request: Request,
@@ -97,6 +98,91 @@ async def get_recommendations(
             'source': source
         }
         
+        return {
+            "status": "success",
+            "data": result,
+            "source": source
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in get_recommendations: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate recommendation: {str(e)}"
+        )
+
+@router.post("/ai-analysis")
+async def get_ai_analysis(county_data: CountyData, force_refresh: bool = False):
+    """
+    Get AI-powered energy recommendations using Claude/Gemini or rule-based fallback.
+    This endpoint uses the intelligent AI agent service with full error handling.
+    
+    Args:
+        county_data: County data for analysis
+        force_refresh: Force refresh (ignore cache)
+    
+    Returns:
+        AI-generated recommendations with confidence scores and reasoning
+    """
+    try:
+        cache_key = get_cache_key(county_data.dict())
+        
+        # Check cache first
+        if not force_refresh and cache_key in recommendation_cache:
+            cached = recommendation_cache[cache_key]
+            if datetime.now() - cached['timestamp'] < CACHE_TTL:
+                logger.info(f"Returning cached AI result for {county_data.county_name}")
+                return {
+                    "status": "success",
+                    "data": cached['data'],
+                    "source": cached['source'],
+                    "cached": True,
+                    "timestamp": cached['timestamp'].isoformat()
+                }
+        
+        # Prepare county analysis request for AI service
+        analysis_request = CountyAnalysisRequest(
+            county_name=county_data.county_name,
+            population=county_data.population,
+            blackout_frequency=county_data.blackout_freq,
+            solar_irradiance=county_data.solar_irradiance or 5.0,
+            economic_activity_index=county_data.economic_activity / 100.0,  # Convert 0-100 to 0-1
+            grid_distance=county_data.grid_distance,
+            hospitals=county_data.hospitals,
+            schools=county_data.schools,
+            current_kwh=county_data.current_kwh
+        )
+        
+        # Get AI recommendation
+        ai_recommendation = await ai_agent.get_county_recommendations(analysis_request)
+        
+        result = {
+            "county": county_data.county_name,
+            "recommendation": ai_recommendation.dict(),
+            "analysis_timestamp": datetime.now().isoformat(),
+            "ai_status": "operational" if ai_agent.has_ai_keys else "fallback_mode"
+        }
+        
+        # Cache the result
+        recommendation_cache[cache_key] = {
+            'data': result,
+            'timestamp': datetime.now(),
+            'source': 'ai_agent'
+        }
+        
+        return {
+            "status": "success",
+            "data": result,
+            "source": "ai_agent",
+            "cached": False
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in get_ai_analysis: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate AI analysis: {str(e)}"
+        )
         return {
             "status": "success",
             "data": result,

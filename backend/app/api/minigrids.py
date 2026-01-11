@@ -16,91 +16,96 @@ async def get_minigrids():
 async def simulate_minigrid(config: Dict[str, Any] = Body(...)):
     """Run enhanced county-specific mini-grid simulation"""
     
-    # Extract configuration with county-specific parameters
-    solar_capacity_kw = config.get("solar_capacity_kw", 50)
-    battery_capacity_kwh = config.get("battery_capacity_kwh", 200)
-    households_served = config.get("households_served", 100)
-    location = config.get("location", "Unknown")
-    
-    # New: County-specific parameters
-    solar_irradiance = config.get("solar_irradiance_kwh_m2", 6.0)
-    blackout_hours = config.get("daily_blackout_hours", 2.0)
-    grid_distance = config.get("grid_distance_km", 50.0)
-    priority_facilities = config.get("priority_facilities", {"hospitals": 5, "schools": 20})
-    
-    # Generate 24-hour simulation data
-    daily_forecast = []
-    battery_soc = 80  # Start at 80% SOC
-    
-    for hour in range(24):
-        # Enhanced Solar generation curve using actual irradiance data
-        if 6 <= hour <= 18:
-            solar_factor = math.sin(math.pi * (hour - 6) / 12)
-            # Use actual solar irradiance from county data
-            irradiance_factor = solar_irradiance / 6.0  # Normalize to standard irradiance
-            generation_kw = solar_capacity_kw * solar_factor * irradiance_factor * random.uniform(0.85, 1.0)
-        else:
-            generation_kw = 0
+    try:
+        # Extract configuration with county-specific parameters (handle None values)
+        solar_capacity_kw = config.get("solar_capacity_kw") or 50
+        battery_capacity_kwh = config.get("battery_capacity_kwh") or 200
+        households_served = config.get("households_served") or 100
+        location = config.get("location", "Unknown")
+        
+        # New: County-specific parameters
+        solar_irradiance = config.get("solar_irradiance_kwh_m2") or 6.0
+        blackout_hours = config.get("daily_blackout_hours") or 2.0
+        grid_distance = config.get("grid_distance_km") or 50.0
+        priority_facilities = config.get("priority_facilities") or {"hospitals": 5, "schools": 20}
+        
+        # Generate 24-hour simulation data
+        daily_forecast = []
+        battery_soc = 80  # Start at 80% SOC
+        
+        for hour in range(24):
+            # Enhanced Solar generation curve using actual irradiance data
+            if 6 <= hour <= 18:
+                solar_factor = math.sin(math.pi * (hour - 6) / 12)
+                # Use actual solar irradiance from county data
+                irradiance_factor = solar_irradiance / 6.0  # Normalize to standard irradiance
+                generation_kw = solar_capacity_kw * solar_factor * irradiance_factor * random.uniform(0.85, 1.0)
+            else:
+                generation_kw = 0
+                
+            # Enhanced demand curve including priority facilities
+            base_household_demand = households_served * 0.5  # 0.5kW average per household
             
-        # Enhanced demand curve including priority facilities
-        base_household_demand = households_served * 0.5  # 0.5kW average per household
-        
-        # Add priority facility demand (hospitals, schools)
-        hospital_demand = priority_facilities.get("hospitals", 0) * 2.0  # 2kW per hospital
-        school_demand = priority_facilities.get("schools", 0) * 0.3 if 8 <= hour <= 16 else 0  # Schools only during day
-        
-        # Time-based demand multipliers
-        if 6 <= hour <= 9 or 18 <= hour <= 22:
-            demand_multiplier = 1.5
-        elif 12 <= hour <= 14:
-            demand_multiplier = 1.2
-        else:
-            demand_multiplier = 0.6
+            # Add priority facility demand (hospitals, schools)
+            hospital_demand = priority_facilities.get("hospitals", 0) * 2.0  # 2kW per hospital
+            school_demand = priority_facilities.get("schools", 0) * 0.3 if 8 <= hour <= 16 else 0  # Schools only during day
             
-        total_demand = (base_household_demand * demand_multiplier) + hospital_demand + school_demand
-        demand_kw = total_demand * random.uniform(0.9, 1.1)
+            # Time-based demand multipliers
+            if 6 <= hour <= 9 or 18 <= hour <= 22:
+                demand_multiplier = 1.5
+            elif 12 <= hour <= 14:
+                demand_multiplier = 1.2
+            else:
+                demand_multiplier = 0.6
+                
+            total_demand = (base_household_demand * demand_multiplier) + hospital_demand + school_demand
+            demand_kw = total_demand * random.uniform(0.9, 1.1)
+            
+            # Battery simulation
+            energy_balance = generation_kw - demand_kw
+            if energy_balance > 0:
+                # Charging
+                battery_soc = min(100, battery_soc + (energy_balance / battery_capacity_kwh) * 100)
+            else:
+                # Discharging
+                battery_soc = max(20, battery_soc + (energy_balance / battery_capacity_kwh) * 100)
+            
+            daily_forecast.append({
+                "hour": hour,
+                "generation_kw": round(generation_kw, 2),
+                "demand_kw": round(demand_kw, 2),
+                "battery_soc": round(battery_soc, 2),
+                "grid_export": max(0, generation_kw - demand_kw) if generation_kw > demand_kw else 0
+            })
         
-        # Battery simulation
-        energy_balance = generation_kw - demand_kw
-        if energy_balance > 0:
-            # Charging
-            battery_soc = min(100, battery_soc + (energy_balance / battery_capacity_kwh) * 100)
-        else:
-            # Discharging
-            battery_soc = max(20, battery_soc + (energy_balance / battery_capacity_kwh) * 100)
+        # Calculate efficiency score
+        total_generation = sum(f["generation_kw"] for f in daily_forecast)
+        total_demand = sum(f["demand_kw"] for f in daily_forecast)
+        efficiency_score = min(100, (total_generation / total_demand) * 90) if total_demand > 0 else 0
         
-        daily_forecast.append({
-            "hour": hour,
-            "generation_kw": round(generation_kw, 2),
-            "demand_kw": round(demand_kw, 2),
-            "battery_soc": round(battery_soc, 2),
-            "grid_export": max(0, generation_kw - demand_kw) if generation_kw > demand_kw else 0
-        })
+        # Calculate cost savings
+        diesel_cost_per_kwh = 0.25  # $0.25 per kWh for diesel
+        cost_savings_usd = total_demand * diesel_cost_per_kwh * 0.8  # 80% savings
     
-    # Calculate efficiency score
-    total_generation = sum(f["generation_kw"] for f in daily_forecast)
-    total_demand = sum(f["demand_kw"] for f in daily_forecast)
-    efficiency_score = min(100, (total_generation / total_demand) * 90) if total_demand > 0 else 0
-    
-    # Calculate cost savings
-    diesel_cost_per_kwh = 0.25  # $0.25 per kWh for diesel
-    cost_savings_usd = total_demand * diesel_cost_per_kwh * 0.8  # 80% savings
-    
-    return {
-        "simulation_id": f"sim_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-        "status": "completed",
-        "config": config,
-        "daily_forecast": daily_forecast,
-        "efficiency_score": round(efficiency_score, 1),
-        "cost_savings_usd": round(cost_savings_usd, 2),
-        "total_generation_kwh": round(total_generation, 2),
-        "total_demand_kwh": round(total_demand, 2),
-        "recommendations": [
-            "Optimize battery charging during peak solar hours (10:00-14:00)",
-            "Consider demand-side management for evening peak loads",
-            "Monitor weather patterns for generation forecasting"
-        ]
-    }
+        return {
+            "simulation_id": f"sim_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            "status": "completed",
+            "config": config,
+            "daily_forecast": daily_forecast,
+            "efficiency_score": round(efficiency_score, 1),
+            "cost_savings_usd": round(cost_savings_usd, 2),
+            "total_generation_kwh": round(total_generation, 2),
+            "total_demand_kwh": round(total_demand, 2),
+            "recommendations": [
+                "Optimize battery charging during peak solar hours (10:00-14:00)",
+                "Consider demand-side management for evening peak loads",
+                "Monitor weather patterns for generation forecasting"
+            ]
+        }
+    except Exception as e:
+        print(f"Simulation error: {str(e)}")
+        print(f"Config received: {config}")
+        raise HTTPException(status_code=500, detail=f"Simulation failed: {str(e)}")
 
 @router.get("/presets")
 async def get_simulation_presets():

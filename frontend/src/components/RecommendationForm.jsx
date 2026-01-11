@@ -73,8 +73,8 @@ const RecommendationForm = () => {
     }
     
     try {
-      const response = await fetch(`http://localhost:8003/api/recommendations/counties/search?q=${encodeURIComponent(query)}`);
-      const data = await response.json();
+      const response = await recommendationAPI.searchCounties(query);
+      const data = response;
       setCounties(data.counties || []);
       setShowDropdown(data.counties && data.counties.length > 0);
     } catch (err) {
@@ -90,9 +90,8 @@ const RecommendationForm = () => {
     
     setLoadingCounty(true);
     try {
-      const response = await fetch(`http://localhost:8003/api/recommendations/counties/${encodeURIComponent(countyName)}/data`);
-      if (response.ok) {
-        const countyData = await response.json();
+      const countyData = await recommendationAPI.getCountyData(countyName);
+      if (countyData) {
         setFormData(prev => ({
           ...prev,
           ...countyData
@@ -145,8 +144,8 @@ const RecommendationForm = () => {
       <h2 className="text-2xl font-bold mb-6 text-gray-800">County Energy Recommendation</h2>
       
       {modelInfo && (
-        <div className="mb-6 p-4 bg-blue-50 rounded-md">
-          <h3 className="font-semibold text-blue-800">Model Information</h3>
+        <div className="mb-6 p-4 bg-green-50 rounded-md">
+          <h3 className="font-semibold text-green-800">Model Information</h3>
           <p className="text-sm text-gray-600">
             Version: {modelInfo.version} | Last Updated: {new Date(modelInfo.timestamp).toLocaleDateString()}
           </p>
@@ -165,7 +164,7 @@ const RecommendationForm = () => {
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700">
               County Name
-              {loadingCounty && <span className="text-blue-500 text-sm ml-2">(Loading data...)</span>}
+              {loadingCounty && <span className="text-green-600 text-sm ml-2">(Loading data...)</span>}
             </label>
             <input
               type="text"
@@ -174,7 +173,7 @@ const RecommendationForm = () => {
               onChange={handleCountyNameChange}
               onClick={(e) => e.stopPropagation()}
               placeholder="Start typing county name..."
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
               required
             />
             {showDropdown && counties.length > 0 && (
@@ -187,7 +186,7 @@ const RecommendationForm = () => {
                         e.stopPropagation();
                         handleCountySelect(county);
                       }}
-                      className="cursor-pointer select-none relative py-2 pl-3 pr-9 text-gray-900 hover:bg-blue-100 transition-colors"
+                      className="cursor-pointer select-none relative py-2 pl-3 pr-9 text-gray-900 hover:bg-green-100 transition-colors"
                     >
                       <span className="block truncate">{county}</span>
                     </li>
@@ -205,7 +204,7 @@ const RecommendationForm = () => {
               value={formData.population}
               onChange={handleChange}
               min="0"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
               required
             />
           </div>
@@ -218,7 +217,7 @@ const RecommendationForm = () => {
               value={formData.hospitals}
               onChange={handleChange}
               min="0"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
               required
             />
           </div>
@@ -231,7 +230,7 @@ const RecommendationForm = () => {
               value={formData.schools}
               onChange={handleChange}
               min="0"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
               required
             />
           </div>
@@ -245,7 +244,7 @@ const RecommendationForm = () => {
               onChange={handleChange}
               min="0"
               step="0.1"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
               required
             />
           </div>
@@ -259,7 +258,7 @@ const RecommendationForm = () => {
               onChange={handleChange}
               min="0"
               max="100"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
               required
             />
           </div>
@@ -273,7 +272,7 @@ const RecommendationForm = () => {
               onChange={handleChange}
               min="0"
               step="0.1"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
               required
             />
           </div>
@@ -286,7 +285,7 @@ const RecommendationForm = () => {
               value={formData.current_kwh}
               onChange={handleChange}
               min="0"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500"
               required
             />
           </div>
@@ -296,7 +295,7 @@ const RecommendationForm = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Processing...' : 'Get Recommendations'}
           </button>
@@ -318,7 +317,7 @@ const RecommendationForm = () => {
               <h4 className="font-medium text-gray-700">Priority Score</h4>
               <div className="w-full bg-gray-200 rounded-full h-4 mt-1">
                 <div 
-                  className="bg-blue-600 h-4 rounded-full" 
+                  className="bg-green-600 h-4 rounded-full" 
                   style={{ width: `${recommendations.priority_score * 10}%` }}
                 ></div>
               </div>
@@ -356,7 +355,7 @@ const RecommendationForm = () => {
                 <div className="mt-2 space-y-2">
                   {recommendations.timeline.map((item, index) => (
                     <div key={index} className="flex items-center">
-                      <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
                       <span className="text-gray-700">{item}</span>
                     </div>
                   ))}

@@ -15,6 +15,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCounty, setSelectedCounty] = useState(null);
   const [analyticsData, setAnalyticsData] = useState({});
+  const [notifications, setNotifications] = useState([]);
+  
   // Check backend connection on component mount
   useEffect(() => {
     const checkBackend = async () => {
@@ -138,7 +140,7 @@ function App() {
   return (
     <Router>
       <div className="app">
-        <Navigation notifications={[]} />
+        <Navigation notifications={notifications} />
         <main className="main-content">
           <Routes>
             <Route path="/" element={
@@ -158,7 +160,7 @@ function App() {
               />
             } />
             <Route path="/alerts" element={
-              <Alerts notifications={[]} />
+              <Alerts notifications={notifications} />
             } />
             <Route path="/recommendations" element={<Recommendations />} />
             <Route path="/contact" element={<Contact />} />

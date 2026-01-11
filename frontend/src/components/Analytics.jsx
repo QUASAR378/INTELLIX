@@ -64,6 +64,20 @@ const Analytics = () => {
     data: null
   });
 
+  // Load counties data
+  useEffect(() => {
+    const loadCounties = async () => {
+      try {
+        const response = await countiesAPI.getAll();
+        setCounties(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error('Failed to load counties:', error);
+        setCounties([]);
+      }
+    };
+    loadCounties();
+  }, []);
+
   // Load recommendations when county changes
   useEffect(() => {
     const loadRecommendations = async () => {
@@ -441,11 +455,11 @@ const Analytics = () => {
                 className="border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="national">🌍 National Overview</option>
-                {counties.map(county => (
-                  <option key={county.id} value={county.id}>
-                    🗺️ {county.name}
-                  </option>
-                ))}
+              {Array.isArray(counties) && counties.map(county => (
+                <option key={county.id} value={county.id}>
+                  🗺️ {county.name}
+                </option>
+              ))}
               </select>
 
               <select 

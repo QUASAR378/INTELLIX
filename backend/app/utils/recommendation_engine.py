@@ -71,9 +71,8 @@ class RuleBasedEngine:
             'source': 'rule_engine'
         }
     
-    @lru_cache(maxsize=1000)
     def get_recommendation(self, county_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Get recommendation using rule-based engine with caching."""
+        """Get recommendation using rule-based engine."""
         try:
             # Try each rule in order
             for rule in self.rules:

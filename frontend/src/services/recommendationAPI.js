@@ -1,13 +1,10 @@
 import api from './api';
 
-// Use the same base URL as other API calls (assuming your FastAPI runs on port 8000)
-const RECOMMENDATION_BASE_URL = 'http://localhost:8003';
-
 const recommendationAPI = {
   // Get recommendations for a county
   getRecommendations: async (countyData) => {
     try {
-      const response = await api.post(`${RECOMMENDATION_BASE_URL}/api/recommendations`, countyData);
+      const response = await api.post('/recommendations/', countyData);
       return response.data.data; // Return the data field from the response
     } catch (error) {
       console.error('Error getting recommendations:', error);
@@ -18,7 +15,7 @@ const recommendationAPI = {
   // Get priority list of counties
   getPriorityCounties: async () => {
     try {
-      const response = await api.get(`${RECOMMENDATION_BASE_URL}/api/recommendations/prioritize`);
+      const response = await api.get('/recommendations/prioritize');
       return response.data.data; // Return the data field from the response
     } catch (error) {
       console.error('Error getting priority counties:', error);
@@ -34,7 +31,7 @@ const recommendationAPI = {
   // Get model info
   getModelInfo: async () => {
     try {
-      const response = await api.get(`${RECOMMENDATION_BASE_URL}/api/recommendations/model/info`);
+      const response = await api.get('/recommendations/model/info');
       return response.data.data; // Return the data field from the response
     } catch (error) {
       console.error('Error getting model info:', error);
@@ -45,7 +42,7 @@ const recommendationAPI = {
   // Get health status
   getHealth: async () => {
     try {
-      const response = await api.get(`${RECOMMENDATION_BASE_URL}/api/recommendations/health`);
+      const response = await api.get('/recommendations/health');
       return response.data;
     } catch (error) {
       console.error('Error getting health status:', error);
@@ -55,6 +52,28 @@ const recommendationAPI = {
         service: 'recommendation-engine',
         version: '1.0.0'
       };
+    }
+  },
+
+  // Search counties for autocomplete
+  searchCounties: async (query) => {
+    try {
+      const response = await api.get(`/recommendations/counties/search?q=${encodeURIComponent(query)}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error searching counties:', error);
+      return { counties: [] };
+    }
+  },
+
+  // Get county data for auto-filling form
+  getCountyData: async (countyName) => {
+    try {
+      const response = await api.get(`/recommendations/counties/${encodeURIComponent(countyName)}/data`);
+      return response.data;
+    } catch (error) {
+      console.error('Error getting county data:', error);
+      return null;
     }
   },
 };

@@ -204,7 +204,7 @@ const AIAnalysis = ({ countyData, onRecommendationReceived }) => {
       </div>
 
       {/* AI Recommendation */}
-      {aiRecommendation && (
+      {aiRecommendation && aiRecommendation.ai_recommendation && (
         <div className="energy-card">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-800">
@@ -290,26 +290,28 @@ const AIAnalysis = ({ countyData, onRecommendationReceived }) => {
           </h3>
           <div className="space-y-3">
             {analysisHistory.slice(0, 3).map((analysis, index) => (
-              <div key={analysis.id} className="border-l-4 border-blue-400 pl-4 py-2 bg-blue-50">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="font-medium text-gray-800">{analysis.county}</span>
-                    <span className="text-sm text-gray-600 ml-2">
-                      {new Date(analysis.timestamp).toLocaleTimeString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      getPriorityColor(analysis.ai_recommendation.priority_level)
-                    }`}>
-                      {analysis.ai_recommendation.priority_level}
-                    </span>
-                    <span className="text-sm text-gray-600">
-                      {analysis.ai_recommendation.confidence_score}% confidence
-                    </span>
+              analysis.ai_recommendation ? (
+                <div key={analysis.id} className="border-l-4 border-green-400 pl-4 py-2 bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="font-medium text-gray-800">{analysis.county}</span>
+                      <span className="text-sm text-gray-600 ml-2">
+                        {new Date(analysis.timestamp).toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        getPriorityColor(analysis.ai_recommendation.priority_level)
+                      }`}>
+                        {analysis.ai_recommendation.priority_level}
+                      </span>
+                      <span className="text-sm text-gray-600">
+                        {analysis.ai_recommendation.confidence_score}% confidence
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : null
             ))}
           </div>
         </div>

@@ -15,6 +15,10 @@ import {
 import KenyaMap from './KenyaMap';
 import CountyDetails from './CountyDetails';
 import MiniGridSim from './MiniGridSim';
+import InteractiveSimulation from './InteractiveSimulation';
+import GuidedTour from './GuidedTour';
+import HelpButton from './HelpButton';
+import PlainLanguageToggle from './PlainLanguageToggle';
 
 import { dashboardAPI, countiesAPI, minigridsAPI } from '../services/api';
 import '../styles/Dashboard.css';
@@ -26,11 +30,15 @@ const Dashboard = () => {
   const [activeView, setActiveView] = useState('map'); // Start with map view
   const [aiRecommendation, setAiRecommendation] = useState(null);
   const [simulationConfig, setSimulationConfig] = useState(null);
+  const [showTour, setShowTour] = useState(false);
 
   // Enhanced county selection with automatic simulation & AI flow
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationProgress, setSimulationProgress] = useState(0);
   const [simulationResults, setSimulationResults] = useState(null);
+  
+  // Visual workflow state (doesn't affect functionality, just UI display)
+  const [visualStep, setVisualStep] = useState(1); // 1=overview, 2=analyzing, 3=insights, 4=scenarios
 
   const handleCountySelect = async (countyData) => {
     try {
@@ -42,6 +50,7 @@ const Dashboard = () => {
       setSimulationProgress(0);
       setSimulationResults(null);
       setAiRecommendation(null);
+      setVisualStep(2); // Move to "analyzing" visual step
       
       console.log(`🔥 DEBUG: isSimulating set to true for ${countyData.name}`);
       
@@ -191,10 +200,12 @@ const Dashboard = () => {
       });
       
       setAiRecommendation(aiResponse.data);
+      setVisualStep(3); // Move to "insights" visual step
       console.log(`✅ STEP 5: AI analysis complete for ${countyName}`, aiResponse.data);
       
     } catch (error) {
       console.error('❌ AI analysis failed:', error);
+      setVisualStep(3); // Still show insights step even on error
     }
   };
 
@@ -223,6 +234,15 @@ const Dashboard = () => {
 
   useEffect(() => {
     loadDashboardData();
+  }, []);
+  
+  // Check if user has completed tour
+  useEffect(() => {
+    const tourCompleted = localStorage.getItem('tourCompleted');
+    if (!tourCompleted) {
+      // Show tour after a brief delay to let dashboard load
+      setTimeout(() => setShowTour(true), 500);
+    }
   }, []);
 
   const loadDashboardData = async () => {
@@ -267,57 +287,62 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-5">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                <FiZap className="w-8 h-8 mr-3 text-green-600" />
-                Kenya Energy AI Dashboard
+              <h1 className="text-2xl font-semibold text-gray-900 flex items-center">
+                <FiZap className="w-6 h-6 mr-2 text-green-600" />
+                Kenya Energy Dashboard
               </h1>
-              <p className="text-gray-600 mt-1">
-                AI-Driven Renewable Energy Allocation & Mini-Grid Optimization
+              <p className="text-sm text-gray-500 mt-1">
+                AI-Powered Energy Planning & Analysis
               </p>
             </div>
             
-            {/* View Toggle */}
-            <div className="flex bg-gray-100 rounded-lg p-1">
-              <button
-                onClick={() => setActiveView('map')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeView === 'map' 
-                    ? 'bg-white text-green-700 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <FiMap className="w-4 h-4 inline mr-2" />
-                Map View
-              </button>
-              <button
-                onClick={() => setActiveView('county-analysis')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  activeView === 'county-analysis' 
-                    ? 'bg-white text-green-700 shadow-sm' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-                disabled={!selectedCounty}
-              >
-                <FiTarget className="w-4 h-4 inline mr-2" />
-                County Analysis
-              </button>
+            <div className="flex items-center space-x-4">
+              {/* Plain Language Toggle */}
+              <PlainLanguageToggle />
+              
+              {/* View Toggle */}
+              <div className="flex bg-gray-100 rounded-lg p-0.5">
+                <button
+                  onClick={() => setActiveView('map')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    activeView === 'map' 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <FiMap className="w-4 h-4 inline mr-1.5" />
+                  Map
+                </button>
+                <button
+                  onClick={() => setActiveView('county-analysis')}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    activeView === 'county-analysis' 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  disabled={!selectedCounty}
+                >
+                  <FiTarget className="w-4 h-4 inline mr-2" />
+                  County Analysis
+                </button>
+              </div>
             </div>
           </div>
           
           {/* Selected County Indicator */}
           {selectedCounty && (
-            <div className="mt-4 inline-flex items-center space-x-2 bg-green-50 rounded-full px-4 py-2 border border-green-200">
+            <div className="mt-4 inline-flex items-center space-x-2 bg-gray-100 rounded-lg px-4 py-2 border border-gray-200">
               <FiCheckCircle className="w-4 h-4 text-green-600" />
-              <span className="text-green-800 font-medium">
-                Analyzing: {selectedCounty.name || selectedCounty.county_name}
+              <span className="text-gray-700 font-medium text-sm">
+                {selectedCounty.name || selectedCounty.county_name}
               </span>
               {aiRecommendation && (
-                <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                  AI: {aiRecommendation.ai_recommendation?.solution_type?.replace('_', ' ')}
+                <span className="px-2 py-1 bg-green-600 text-white rounded text-xs">
+                  {aiRecommendation.ai_recommendation?.solution_type?.replace('_', ' ')}
                 </span>
               )}
             </div>
@@ -330,14 +355,14 @@ const Dashboard = () => {
         {activeView === 'map' && (
           <div className="space-y-8">
             {/* Interactive Map */}
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="mb-4">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
-                  <FiMap className="w-6 h-6 mr-3 text-green-600" />
-                  Kenya Energy Allocation Map
+            <div className="bg-white rounded-lg border border-gray-200">
+              <div className="p-5 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-900 mb-1 flex items-center">
+                  <FiMap className="w-5 h-5 mr-2 text-green-600" />
+                  County Energy Map
                 </h2>
-                <p className="text-gray-600">
-                  Click on any county to get AI-powered energy recommendations and mini-grid simulations
+                <p className="text-sm text-gray-500">
+                  Select a county to view analysis and recommendations
                 </p>
               </div>
               <div className="h-[600px]">
@@ -354,34 +379,55 @@ const Dashboard = () => {
 
         {activeView === 'county-analysis' && selectedCounty && (
           <div className="county-analysis-grid grid grid-cols-1 lg:grid-cols-5 gap-12">
-            {/* County Details - More space, less compressed */}
+            {/* County Details - Always visible */}
             <div className="lg:col-span-2">
               <CountyDetails county={selectedCounty} />
+              
+              {/* Step 4: Explore Scenarios Button (only after AI insights) */}
+              {visualStep >= 3 && !isSimulating && aiRecommendation && (
+                <div className="mt-6">
+                  <button
+                    onClick={() => setVisualStep(4)}
+                    className={`w-full flex items-center justify-center space-x-3 px-6 py-4 rounded-lg transition-all shadow-lg hover:shadow-xl ${
+                      visualStep === 4 
+                        ? 'bg-gray-200 text-gray-700' 
+                        : 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800'
+                    }`}
+                  >
+                    <FiActivity className="w-5 h-5" />
+                    <span className="font-semibold text-lg">
+                      {visualStep === 4 ? '✓ Exploring Scenarios' : 'Explore What-If Scenarios'}
+                    </span>
+                  </button>
+                </div>
+              )}
             </div>
 
-            {/* Live Analysis & Simulation - Balanced space */}
+            {/* Live Analysis & Simulation - Progressive Display */}
             <div className="lg:col-span-3 space-y-6">
               
-              {/* Simulation Progress */}
-
-              {isSimulating && (
-                <div className="simulation-progress bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg shadow-lg p-8 text-white">
+              {/* Step 2: Simulation Progress & Live Chart */}
+              {visualStep >= 2 && (
+                <>
+                  {/* Simulation Progress */}
+                  {isSimulating && (
+                <div className="simulation-progress bg-white border border-gray-200 rounded-lg p-8">
                   <div className="text-center">
                     <div className="mb-4">
-                      <FiZap className="w-12 h-12 mx-auto text-white animate-pulse" />
+                      <FiZap className="w-10 h-10 mx-auto text-green-600 animate-pulse" />
                     </div>
-                    <h3 className="text-2xl font-bold mb-2 flex items-center justify-center">
-                      <FiCpu className="w-6 h-6 mr-2" />
-                      Running Mini-Grid Simulation
+                    <h3 className="text-xl font-semibold mb-2 text-gray-900 flex items-center justify-center">
+                      <FiCpu className="w-5 h-5 mr-2" />
+                      Analyzing Energy Data
                     </h3>
-                    <p className="text-blue-100 mb-6">
-                      Analyzing energy patterns for {selectedCounty?.name || selectedCounty?.county_name}...
+                    <p className="text-gray-500 mb-6 text-sm">
+                      Processing {selectedCounty?.name || selectedCounty?.county_name}...
                     </p>
                     
                     {/* Progress Bar */}
-                    <div className="progress-bar w-full bg-white/20 rounded-full h-3 mb-4">
+                    <div className="progress-bar w-full bg-gray-200 rounded-full h-2 mb-4">
                       <div 
-                        className="progress-fill bg-white h-3 rounded-full transition-all duration-200 ease-out"
+                        className="progress-fill bg-green-600 h-2 rounded-full transition-all duration-200 ease-out"
                         style={{ width: `${simulationProgress}%` }}
                       ></div>
                     </div>
@@ -430,48 +476,45 @@ const Dashboard = () => {
 
               {/* Simulation Results */}
               {!isSimulating && simulationResults && !aiRecommendation && (
-                <div className="simulation-results bg-white rounded-lg shadow-sm border p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                    <FiActivity className="w-6 h-6 mr-3 text-blue-600" />
+                <div className="simulation-results bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <FiActivity className="w-5 h-5 mr-2 text-green-600" />
                     Simulation Results
-                    <span className="ml-3 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                      Analysis Complete - Starting Live Demo
-                    </span>
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-                    <div className="p-5 bg-green-50 rounded-lg border border-green-200 flex flex-col items-center text-center">
-                      <FiZap className="w-8 h-8 text-green-600 mb-2" />
-                      <div className="text-2xl font-bold text-green-700 mb-1">
-                        {simulationResults.energy_generated?.toFixed(0) || 'N/A'} kWh
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200\">
+                      <FiZap className="w-5 h-5 text-green-600 mb-2" />
+                      <div className="text-xl font-semibold text-gray-900 mb-1">
+                        {simulationResults.energy_generated?.toFixed(0) || 'N/A'}
                       </div>
-                      <div className="text-sm text-green-600 font-medium">Daily Generation</div>
+                      <div className="text-xs text-gray-500\">kWh Daily</div>
                     </div>
-                    <div className="p-5 bg-blue-50 rounded-lg border border-blue-200 flex flex-col items-center text-center">
-                      <FiHome className="w-8 h-8 text-blue-600 mb-2" />
-                      <div className="text-2xl font-bold text-blue-700 mb-1">
+                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200\">
+                      <FiHome className="w-5 h-5 text-green-600 mb-2" />
+                      <div className="text-xl font-semibold text-gray-900 mb-1">
                         {simulationResults.households_served || simulationConfig?.households_served || 'N/A'}
                       </div>
-                      <div className="text-sm text-blue-600 font-medium">Households Served</div>
+                      <div className="text-xs text-gray-500\">Households</div>
                     </div>
-                    <div className="p-5 bg-purple-50 rounded-lg border border-purple-200 flex flex-col items-center text-center">
-                      <FiDollarSign className="w-8 h-8 text-purple-600 mb-2" />
-                      <div className="text-2xl font-bold text-purple-700 mb-1">
+                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200\">
+                      <FiDollarSign className="w-5 h-5 text-green-600 mb-2" />
+                      <div className="text-xl font-semibold text-gray-900 mb-1">
                         ${simulationResults.total_cost?.toLocaleString() || 'N/A'}
                       </div>
-                      <div className="text-sm text-purple-600 font-medium">Total Cost</div>
+                      <div className="text-xs text-gray-500\">Investment</div>
                     </div>
-                    <div className="p-5 bg-orange-50 rounded-lg border border-orange-200 flex flex-col items-center text-center">
-                      <FiTarget className="w-8 h-8 text-orange-600 mb-2" />
-                      <div className="text-2xl font-bold text-orange-700 mb-1">
-                        {simulationResults.payback_period || 'N/A'} years
+                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200\">
+                      <FiTarget className="w-5 h-5 text-green-600 mb-2" />
+                      <div className="text-xl font-semibold text-gray-900 mb-1">
+                        {simulationResults.payback_period || 'N/A'}
                       </div>
-                      <div className="text-sm text-orange-600 font-medium">Payback Period</div>
+                      <div className="text-xs text-gray-500\">Years Payback</div>
                     </div>
                   </div>
-                  <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-blue-700 text-sm flex items-center">
-                      <FiActivity className="w-4 h-4 mr-2 text-red-500 animate-pulse" />
-                      <strong>45-Second Live Demo starting below...</strong> Watch the red line move through 24-hour energy cycles!
+                  <div className="mt-4 p-3 bg-gray-50 rounded-lg border border-gray-200\">
+                    <p className="text-gray-600 text-sm flex items-center">
+                      <FiActivity className="w-4 h-4 mr-2 text-green-600\" />
+                      Starting live 24-hour simulation...
                     </p>
                   </div>
                 </div>
@@ -479,13 +522,10 @@ const Dashboard = () => {
 
               {/* Live Mini-Grid Simulation */}
               {!isSimulating && simulationConfig && !aiRecommendation && (
-                <div className="bg-white rounded-lg shadow-sm border p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                    <FiZap className="w-6 h-6 mr-3 text-green-600" />
-                    Live Mini-Grid Simulation
-                    <span className="ml-3 px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs animate-pulse">
-                      LIVE NOW
-                    </span>
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <FiZap className="w-5 h-5 mr-2 text-green-600" />
+                    Live Energy Simulation
                   </h3>
                   <MiniGridSim 
                     initialConfig={simulationConfig}
@@ -495,37 +535,28 @@ const Dashboard = () => {
                   />
                 </div>
               )}
-
-              {/* AI Analysis */}
-              {!isSimulating && aiRecommendation && (
-                <div className="bg-white rounded-lg shadow-sm border p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                    <FiCpu className="w-6 h-6 mr-3 text-purple-600" />
-                    AI Energy Recommendations
-                    <span className="ml-3 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                      Based on Live Simulation
-                    </span>
+                </>
+              )}
+              
+              {/* Step 3: AI Analysis & Insights */}
+              {visualStep >= 3 && !isSimulating && aiRecommendation && (
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <FiCpu className="w-5 h-5 mr-2 text-green-600" />
+                    AI Recommendations
                   </h3>
                   <AIAnalysisDisplay recommendation={aiRecommendation} />
                 </div>
               )}
 
-              {/* Mini-Grid Simulation Interactive Chart (After AI recommendations) */}
-              {!isSimulating && simulationConfig && aiRecommendation && (
-                <div className="bg-white rounded-lg shadow-sm border p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                    <FiZap className="w-6 h-6 mr-3 text-green-600" />
-                    Interactive Mini-Grid Dashboard
-                    {simulationConfig && (
-                      <span className="ml-3 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                        County-Optimized
-                      </span>
-                    )}
+              {/* Step 4: Interactive Scenario Builder (only when button clicked) */}
+              {visualStep >= 4 && !isSimulating && simulationConfig && aiRecommendation && (
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <FiZap className="w-5 h-5 mr-2 text-green-600" />
+                    Interactive Scenario Builder
                   </h3>
-                  <MiniGridSim 
-                    initialConfig={simulationConfig}
-                    countyName={selectedCounty?.name || selectedCounty?.county_name}
-                  />
+                  <InteractiveSimulation countyData={selectedCounty} />
                 </div>
               )}
 
@@ -554,6 +585,12 @@ const Dashboard = () => {
           </div>
         )}
       </div>
+      
+      {/* Guided Tour */}
+      {showTour && <GuidedTour onComplete={() => setShowTour(false)} />}
+      
+      {/* Help Button */}
+      <HelpButton onStartTour={() => setShowTour(true)} />
     </div>
   );
 };
@@ -723,7 +760,5 @@ const AIAnalysisDisplay = ({ recommendation }) => {
     </div>
   );
 };
-
-
 
 export default Dashboard;

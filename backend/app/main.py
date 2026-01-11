@@ -1,7 +1,7 @@
 # backend/app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import counties, minigrids, dashboard, analytics, county_recommendations
+from app.api import counties, minigrids, dashboard, analytics, county_recommendations, alerts
 from config.settings import settings
 
 app = FastAPI(
@@ -13,7 +13,8 @@ app = FastAPI(
 # CORS middleware to allow frontend connections
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS + ["*"],  # Allow all for development
+    allow_origins=settings.ALLOWED_ORIGINS,  # Use configured origins only
+    allow_origin_regex=r"https://.*\.app\.github\.dev",  # GitHub Codespaces
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -25,6 +26,7 @@ app.include_router(minigrids.router, prefix="/api/minigrids", tags=["minigrids"]
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
 app.include_router(county_recommendations.router, prefix="/api/recommendations", tags=["recommendations"])
+app.include_router(alerts.router, prefix="/api/alerts", tags=["alerts"])
 
 @app.get("/")
 async def root():
@@ -38,6 +40,7 @@ async def root():
             "minigrids": "/api/minigrids/",
             "analytics": "/api/analytics/",
             "recommendations": "/api/recommendations/",
+            "alerts": "/api/alerts/",
             "docs": "/docs"
         }
     }

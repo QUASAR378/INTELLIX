@@ -40,6 +40,11 @@ class AIAgentService:
         self.gemini_api_key = settings.GOOGLE_AI_API_KEY
         self.claude_url = "https://api.anthropic.com/v1/messages"
         self.gemini_url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent"
+    
+    @property
+    def has_ai_keys(self) -> bool:
+        """Check if any AI API keys are configured"""
+        return bool(self.claude_api_key or self.gemini_api_key)
         
     async def get_county_recommendations(self, county_data: CountyAnalysisRequest) -> AIRecommendation:
         """Get AI-powered recommendations for a county based on its energy profile"""
@@ -64,7 +69,7 @@ class AIAgentService:
 You are an expert energy systems analyst for Kenya's renewable energy planning. Analyze the following county data and provide specific, actionable recommendations for energy infrastructure development.
 
 County: {county_data.county_name}
-Population: {county_data.population:,}
+Population: {county_data.population}
 Blackout Frequency: {county_data.blackout_frequency} outages/month
 Solar Irradiance: {county_data.solar_irradiance} kWh/m²/day
 Economic Activity Index: {county_data.economic_activity_index} (0-1 scale)
@@ -91,7 +96,7 @@ Consider factors like:
 - Social acceptance and community ownership models
 
 Respond in JSON format matching this structure:
-{
+{{
   "priority_level": "high/medium/low",
   "solution_type": "solution_name",
   "investment_needed": 0,
@@ -100,11 +105,14 @@ Respond in JSON format matching this structure:
   "recommendations": ["rec1", "rec2", "rec3"],
   "reasoning": "explanation",
   "confidence_score": 0.0
-}
+}}
 """
 
     async def _get_claude_recommendation(self, prompt: str, county_data: CountyAnalysisRequest) -> AIRecommendation:
         """Get recommendation from Claude API"""
+        if not self.claude_api_key:
+            raise Exception("Claude API key not configured")
+            
         headers = {
             "Content-Type": "application/json",
             "x-api-key": self.claude_api_key,
@@ -112,7 +120,7 @@ Respond in JSON format matching this structure:
         }
         
         payload = {
-            "model": "claude-3-sonnet-20240229",
+            "model": "claude-3-5-sonnet-20241022",  # Updated model version
             "max_tokens": 1000,
             "messages": [
                 {
@@ -122,24 +130,46 @@ Respond in JSON format matching this structure:
             ]
         }
         
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self.claude_url, headers=headers, json=payload) as response:
-                if response.status == 200:
-                    result = await response.json()
-                    content = result["content"][0]["text"]
-                    
-                    # Parse JSON response
-                    try:
-                        recommendation_data = json.loads(content)
-                        return AIRecommendation(**recommendation_data)
-                    except json.JSONDecodeError:
-                        # Fallback if JSON parsing fails
-                        return self._get_rule_based_recommendation(county_data)
-                else:
-                    raise Exception(f"Claude API error: {response.status}")
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(self.claude_url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=30)) as response:
+                    if response.status == 200:
+                        result = await response.json()
+                        content = result.get("content", [{}])[0].get("text", "")
+                        
+                        # Parse JSON response - look for JSON block in response
+                        try:
+                            # Try to extract JSON from code blocks if present
+                            if "```json" in content:
+                                json_str = content.split("```json")[1].split("```")[0].strip()
+                            elif "```" in content:
+                                json_str = content.split("```")[1].split("```")[0].strip()
+                            else:
+                                json_str = content
+                                
+                            recommendation_data = json.loads(json_str)
+                            return AIRecommendation(**recommendation_data)
+                        except (json.JSONDecodeError, IndexError, ValueError) as e:
+                            print(f"JSON parsing failed: {e}. Using fallback.")
+                            return self._get_rule_based_recommendation(county_data)
+                    elif response.status == 401:
+                        raise Exception("Claude API key is invalid or expired")
+                    elif response.status == 429:
+                        raise Exception("Claude API rate limit exceeded")
+                    else:
+                        error_text = await response.text()
+                        raise Exception(f"Claude API error {response.status}: {error_text}")
+        except asyncio.TimeoutError:
+            raise Exception("Claude API request timeout")
+        except Exception as e:
+            print(f"Claude API error: {e}")
+            return self._get_rule_based_recommendation(county_data)
 
     async def _get_gemini_recommendation(self, prompt: str, county_data: CountyAnalysisRequest) -> AIRecommendation:
         """Get recommendation from Gemini API"""
+        if not self.gemini_api_key:
+            raise Exception("Gemini API key not configured")
+            
         headers = {
             "Content-Type": "application/json"
         }
@@ -162,20 +192,47 @@ Respond in JSON format matching this structure:
         
         url = f"{self.gemini_url}?key={self.gemini_api_key}"
         
-        async with aiohttp.ClientSession() as session:
-            async with session.post(url, headers=headers, json=payload) as response:
-                if response.status == 200:
-                    result = await response.json()
-                    content = result["candidates"][0]["content"]["parts"][0]["text"]
-                    
-                    # Parse JSON response
-                    try:
-                        recommendation_data = json.loads(content)
-                        return AIRecommendation(**recommendation_data)
-                    except json.JSONDecodeError:
-                        return self._get_rule_based_recommendation(county_data)
-                else:
-                    raise Exception(f"Gemini API error: {response.status}")
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(url, headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=30)) as response:
+                    if response.status == 200:
+                        result = await response.json()
+                        candidates = result.get("candidates", [])
+                        if candidates and "content" in candidates[0]:
+                            content = candidates[0]["content"].get("parts", [{}])[0].get("text", "")
+                            
+                            # Parse JSON response - look for JSON block in response
+                            try:
+                                # Try to extract JSON from code blocks if present
+                                if "```json" in content:
+                                    json_str = content.split("```json")[1].split("```")[0].strip()
+                                elif "```" in content:
+                                    json_str = content.split("```")[1].split("```")[0].strip()
+                                else:
+                                    json_str = content
+                                    
+                                recommendation_data = json.loads(json_str)
+                                return AIRecommendation(**recommendation_data)
+                            except (json.JSONDecodeError, IndexError, ValueError) as e:
+                                print(f"JSON parsing failed: {e}. Using fallback.")
+                                return self._get_rule_based_recommendation(county_data)
+                        else:
+                            raise Exception("Unexpected Gemini API response format")
+                    elif response.status == 400:
+                        error_text = await response.text()
+                        raise Exception(f"Gemini API bad request: {error_text}")
+                    elif response.status == 401:
+                        raise Exception("Gemini API key is invalid or expired")
+                    elif response.status == 429:
+                        raise Exception("Gemini API rate limit exceeded")
+                    else:
+                        error_text = await response.text()
+                        raise Exception(f"Gemini API error {response.status}: {error_text}")
+        except asyncio.TimeoutError:
+            raise Exception("Gemini API request timeout")
+        except Exception as e:
+            print(f"Gemini API error: {e}")
+            return self._get_rule_based_recommendation(county_data)
 
     def _get_rule_based_recommendation(self, county_data: CountyAnalysisRequest) -> AIRecommendation:
         """Fallback rule-based recommendation system"""
