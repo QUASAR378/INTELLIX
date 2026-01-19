@@ -26,6 +26,7 @@ import '../styles/Dashboard.css';
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [selectedCounty, setSelectedCounty] = useState(null);
+  const [countyTab, setCountyTab] = useState('overview');
   const [isLoading, setIsLoading] = useState(true);
   const [activeView, setActiveView] = useState('map'); // Start with map view
   const [aiRecommendation, setAiRecommendation] = useState(null);
@@ -380,11 +381,11 @@ const Dashboard = () => {
         {activeView === 'county-analysis' && selectedCounty && (
           <div className="county-analysis-grid grid grid-cols-1 lg:grid-cols-5 gap-12">
             {/* County Details - Always visible */}
-            <div className="lg:col-span-2">
-              <CountyDetails county={selectedCounty} />
+            <div className="lg:col-span-5">
+              <CountyDetails county={selectedCounty} onTabChange={setCountyTab} />
               
               {/* Step 4: Explore Scenarios Button (only after AI insights) */}
-              {visualStep >= 3 && !isSimulating && aiRecommendation && (
+              {countyTab === 'recommendations' && visualStep >= 3 && !isSimulating && aiRecommendation && (
                 <div className="mt-6">
                   <button
                     onClick={() => setVisualStep(4)}
@@ -401,10 +402,22 @@ const Dashboard = () => {
                   </button>
                 </div>
               )}
+
+              {/* Step 4: Interactive Scenario Builder (AI tab only) */}
+              {countyTab === 'recommendations' && visualStep >= 4 && !isSimulating && simulationConfig && aiRecommendation && (
+                <div className="mt-6 bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <FiZap className="w-5 h-5 mr-2 text-green-600" />
+                    Interactive Scenario Builder
+                  </h3>
+                  <InteractiveSimulation countyData={selectedCounty} />
+                </div>
+              )}
             </div>
 
             {/* Live Analysis & Simulation - Progressive Display */}
-            <div className="lg:col-span-3 space-y-6">
+            {countyTab === 'energy' && (
+            <div className="lg:col-span-5 space-y-6">
               
               {/* Step 2: Simulation Progress & Live Chart */}
               {visualStep >= 2 && (
@@ -549,19 +562,8 @@ const Dashboard = () => {
                 </div>
               )}
 
-              {/* Step 4: Interactive Scenario Builder (only when button clicked) */}
-              {visualStep >= 4 && !isSimulating && simulationConfig && aiRecommendation && (
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                    <FiZap className="w-5 h-5 mr-2 text-green-600" />
-                    Interactive Scenario Builder
-                  </h3>
-                  <InteractiveSimulation countyData={selectedCounty} />
-                </div>
-              )}
-
-
             </div>
+            )}
           </div>
         )}
 

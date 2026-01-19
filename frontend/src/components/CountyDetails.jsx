@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip as ChartTooltip, Legend } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 import AIAnalysis from './AIAnalysis';
-import Tooltip from './Tooltip';
 import { 
   FiGrid, 
   FiZap, 
@@ -24,7 +23,7 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, ChartTooltip, Legend);
 
-const CountyDetails = ({ county }) => {
+const CountyDetails = ({ county, onTabChange }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isAnimated, setIsAnimated] = useState(false);
 
@@ -32,6 +31,12 @@ const CountyDetails = ({ county }) => {
     console.log('CountyDetails received county data:', county);
     setTimeout(() => setIsAnimated(true), 100);
   }, [county]);
+
+  useEffect(() => {
+    if (onTabChange) {
+      onTabChange(activeTab);
+    }
+  }, [activeTab, onTabChange]);
 
   if (!county) {
     return (
@@ -72,14 +77,14 @@ const CountyDetails = ({ county }) => {
 
 
   return (
-    <div className="space-y-4">
-      {/* Compact Header Section */}
-      <div className={`bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-lg p-5 ${isAnimated ? 'animate-fade-in' : 'opacity-0'}`}>
-        <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className={`bg-gradient-to-r from-gray-50 to-white border border-gray-200 rounded-xl p-6 ${isAnimated ? 'animate-fade-in' : 'opacity-0'}`}>
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 mb-1">{county.name || county.county_name} County</h1>
-            <div className="flex items-center space-x-3">
-              <span className="text-sm text-gray-500">{county.region || 'Kenya'} Region</span>
+            <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500">
+              <span>{county.region || 'Kenya'} Region</span>
               <span className="text-gray-300">•</span>
               <span className={`text-xs font-semibold px-2 py-0.5 rounded ${
                 (county.priority_score || 50) >= 80 ? 'bg-red-100 text-red-700' :
@@ -91,7 +96,7 @@ const CountyDetails = ({ county }) => {
             </div>
           </div>
           
-          <div className="text-right bg-green-50 px-4 py-3 rounded-lg border border-green-200">
+          <div className="text-left md:text-right bg-green-50 px-4 py-3 rounded-lg border border-green-200">
             <div className="text-2xl font-bold text-green-700">
               ${((county.investment_needed_usd || estimatedDemand * 5000) / 1000000).toFixed(1)}M
             </div>
@@ -100,20 +105,20 @@ const CountyDetails = ({ county }) => {
         </div>
       </div>
 
-      {/* Compact Tabs Navigation */}
-      <div className="flex space-x-1 bg-white border border-gray-200 rounded-lg p-1">
+      {/* Tabs Navigation */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-white border border-gray-200 rounded-lg p-2">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2.5 rounded-md font-medium transition-all text-sm ${
+            className={`flex items-center justify-center space-x-2 px-4 py-2.5 rounded-md font-medium transition-all text-sm ${
               activeTab === tab.id
                 ? 'bg-green-600 text-white shadow-sm'
                 : 'text-gray-600 hover:bg-gray-50'
             }`}
           >
             <tab.icon className="w-4 h-4" />
-            <span className="hidden sm:inline">{tab.label}</span>
+            <span>{tab.label}</span>
           </button>
         ))}
       </div>
@@ -124,98 +129,53 @@ const CountyDetails = ({ county }) => {
         {/* Overview Tab */}
         {activeTab === 'overview' && (
           <div className="space-y-8">
-            {/* Key Metrics Card - Full Width */}
+            {/* Summary Metrics */}
             <div className="energy-card">
-              <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                 <FiActivity className="w-5 h-5 mr-2" />
-                Key Metrics
+                Summary
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <FiUsers className="w-5 h-5 text-green-600" />
-                    <span className="text-gray-600 text-sm font-medium">Population</span>
-                    <Tooltip text="Number of people living in this county" position="right" />
-                  </div>
-                  <div className="text-xl font-bold text-gray-900">
-                    {(county.population || 0).toLocaleString()}
-                  </div>
-                </div>
-                
-                <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <FiZap className="w-5 h-5 text-green-600" />
-                    <span className="text-gray-600 text-sm font-medium">Energy Deficit</span>
-                    <Tooltip text="Gap between electricity demand and current supply in megawatt-hours" position="right" />
-                  </div>
-                  <div className="text-xl font-bold text-gray-900">
-                    {(estimatedDeficit / 1000).toFixed(1)} MWh
-                  </div>
-                </div>
-                
-                <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <FiWifi className="w-5 h-5 text-green-600" />
-                    <span className="text-gray-600 text-sm font-medium">Grid Distance</span>
-                    <Tooltip text="Distance from the nearest main power grid connection point" position="right" />
-                  </div>
-                  <div className="text-xl font-bold text-gray-900">
-                    {county.grid_distance || 0} km
-                  </div>
-                </div>
-                
-                <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <FiSun className="w-5 h-5 text-green-600" />
-                    <span className="text-gray-600 text-sm font-medium">Solar Potential</span>
-                    <Tooltip text="Average daily sunlight available for solar panels, measured in kilowatt-hours per square meter" position="right" />
-                  </div>
-                  <div className="text-xl font-bold text-gray-900">
-                    {(county.solar_irradiance || 0).toFixed(1)} kWh/m²
-                  </div>
-                </div>
-                
-                <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <FiAlertOctagon className="w-5 h-5 text-green-600" />
-                    <span className="text-gray-600 text-sm font-medium">Power Outages</span>
-                    <Tooltip text="Number of electricity blackouts experienced per month" position="right" />
-                  </div>
-                  <div className="text-xl font-bold text-gray-900">
-                    {county.blackout_freq || county.blackout_frequency || 0}/month
-                  </div>
-                </div>
+                <MetricCard
+                  icon={FiUsers}
+                  label="Population"
+                  value={(county.population || 0).toLocaleString()}
+                />
+                <MetricCard
+                  icon={FiZap}
+                  label="Energy Deficit"
+                  value={`${(estimatedDeficit / 1000).toFixed(1)} MWh`}
+                />
+                <MetricCard
+                  icon={FiSun}
+                  label="Solar Potential"
+                  value={`${(county.solar_irradiance || 0).toFixed(1)} kWh/m²`}
+                />
               </div>
             </div>
 
-            {/* Infrastructure Card - Full Width */}
+            {/* Infrastructure Card */}
             <div className="energy-card">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
                 <FiGrid className="w-5 h-5 mr-2 text-green-600" />
                 Infrastructure
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="text-center bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <FiActivity className="w-5 h-5 text-green-600 mx-auto mb-2" />
-                  <div className="text-xl font-bold text-gray-900 mb-1">
-                    {county.hospitals || 0}
-                  </div>
-                  <div className="text-xs font-medium text-gray-600">Hospitals</div>
-                </div>
-                <div className="text-center bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <FiBook className="w-5 h-5 text-green-600 mx-auto mb-2" />
-                  <div className="text-xl font-bold text-gray-900 mb-1">
-                    {county.schools || 0}
-                  </div>
-                  <div className="text-xs font-medium text-gray-600">Schools</div>
-                </div>
-                <div className="text-center bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <FiHome className="w-5 h-5 text-green-600 mx-auto mb-2" />
-                  <div className="text-xl font-bold text-gray-900 mb-1">
-                    {Math.floor((county.population || 0) / 4.5).toLocaleString()}
-                  </div>
-                  <div className="text-xs font-medium text-gray-600">Est. Households</div>
-                </div>
+                <InfrastructureCard
+                  icon={FiActivity}
+                  label="Hospitals"
+                  value={county.hospitals || 0}
+                />
+                <InfrastructureCard
+                  icon={FiBook}
+                  label="Schools"
+                  value={county.schools || 0}
+                />
+                <InfrastructureCard
+                  icon={FiHome}
+                  label="Est. Households"
+                  value={Math.floor((county.population || 0) / 4.5).toLocaleString()}
+                />
               </div>
             </div>
           </div>
@@ -342,6 +302,24 @@ const ProgressBar = ({ label, value, color }) => (
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
       ></div>
     </div>
+  </div>
+);
+
+const MetricCard = ({ icon: Icon, label, value }) => (
+  <div className="bg-gray-50 p-5 rounded-lg border border-gray-200">
+    <div className="flex items-center space-x-2 mb-2">
+      <Icon className="w-5 h-5 text-green-600" />
+      <span className="text-gray-600 text-sm font-medium">{label}</span>
+    </div>
+    <div className="text-xl font-bold text-gray-900">{value}</div>
+  </div>
+);
+
+const InfrastructureCard = ({ icon: Icon, label, value }) => (
+  <div className="text-center bg-gray-50 border border-gray-200 rounded-lg p-4">
+    <Icon className="w-5 h-5 text-green-600 mx-auto mb-2" />
+    <div className="text-xl font-bold text-gray-900 mb-1">{value}</div>
+    <div className="text-xs font-medium text-gray-600">{label}</div>
   </div>
 );
 

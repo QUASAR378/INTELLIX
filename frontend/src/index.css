@@ -34,6 +34,17 @@
     @apply bg-energy-secondary text-white px-4 py-2 rounded-md font-medium
            shadow-md hover:bg-amber-600 transition-all duration-200;
   }
+
+  .app {
+    @apply min-h-screen flex flex-col bg-slate-50;
+  }
+
+  .main-content {
+    @apply w-full flex-1 px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12;
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 /* Loading animations */

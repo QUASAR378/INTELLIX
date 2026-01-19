@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // Auto-detect Codespaces or use localhost
 const API_BASE_URL = window.location.hostname.includes('github.dev')
-  ? `https://${window.location.hostname.replace(/5173|5174/, '8002')}/api`
-  : 'http://localhost:8002/api';
+  ? `https://${window.location.hostname.replace(/5173|5174/, '8000')}/api`
+  : 'http://localhost:8000/api';
 
 // Create axios instance with robust configuration
 const api = axios.create({
@@ -81,7 +81,7 @@ api.interceptors.response.use(
     }
     
     if (error.code === 'ECONNREFUSED' || error.message === 'Request aborted' || !error.response) {
-      const backendError = new Error('Backend Connection Failed. Please ensure the FastAPI backend is running on port 8003.');
+      const backendError = new Error('Backend Connection Failed. Please ensure the FastAPI backend is running on port 8000.');
       backendError.code = 'BACKEND_CONNECTION_FAILED';
       backendError.originalError = error;
       throw backendError;
